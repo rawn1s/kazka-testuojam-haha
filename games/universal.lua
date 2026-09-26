@@ -2,12 +2,12 @@
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- 1. Window Creation with a stable built-in theme string
+-- 1. Window Creation
 local Window = Rayfield:CreateWindow({
     Name = "Sakka Hub",
     LoadingTitle = "Sakka is loading...",
     LoadingSubtitle = "by rawn1s",
-    Theme = "Default", -- Stable built-in theme to prevent nil property crashes
+    Theme = "Default",
 
     ConfigurationSaving = {
        Enabled = true,
@@ -36,22 +36,22 @@ InfoTab:CreateParagraph({
 
 Rayfield:LoadConfiguration()
 
--- 4. Runtime UI Patch: Target the title text, update its color, and change its font
+-- 4. Runtime UI Patch: Title Customization + Image ID Logger
 task.spawn(function()
-    task.wait(0.6) -- Allow Rayfield elements to fully mount in CoreGui
+    task.wait(0.8) -- Allow Rayfield elements to fully mount
     
     for _, descendant in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+        -- Style the title text
         if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
             descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
             descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
         end
-            -- Swap topbar button icons (ImageButtons or ImageLabels)
+        
+        -- Print out image elements so we can see their exact asset IDs in the F9 console
         if descendant:IsA("ImageButton") or descendant:IsA("ImageLabel") then
-            if string.find(descendant.Image, "6034287515") or string.find(descendant.Image, "sliders") then
-                descendant.Image = "rbxassetid://6031260907" -- Gear icon
-            elseif string.find(descendant.Image, "6035047409") or string.find(descendant.Image, "square") then
-                descendant.Image = "rbxassetid://6023426915" -- Dash icon
+            if descendant.Image ~= "" then
+                print("Found GUI Image -> Name: " .. descendant.Name .. " | ID: " .. descendant.Image)
             end
-        end 
+        end
     end
 end)
