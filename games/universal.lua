@@ -45,5 +45,13 @@ task.spawn(function()
             descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
             descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
         end
+            -- Swap topbar button icons (ImageButtons or ImageLabels)
+        if descendant:IsA("ImageButton") or descendant:IsA("ImageLabel") then
+            if string.find(descendant.Image, "6034287515") or string.find(descendant.Image, "sliders") then
+                descendant.Image = "rbxassetid://6031260907" -- Gear icon
+            elseif string.find(descendant.Image, "6035047409") or string.find(descendant.Image, "square") then
+                descendant.Image = "rbxassetid://6023426915" -- Dash icon
+            end
+        end 
     end
 end)
