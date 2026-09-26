@@ -43,7 +43,7 @@ task.spawn(function()
     for _, descendant in ipairs(game:GetService("CoreGui"):GetDescendants()) do
         if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
             descendant.TextColor3 = Color3.fromRGB(235, 50, 50) -- Cool Red Accent
-            descendant.FontFace = Font.fromName(Enum.Font.PermanentMarker)
+            descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
         end
     end
 end)
