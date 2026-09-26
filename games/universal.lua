@@ -1,8 +1,8 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:Window({
-   Name = "Universal Script Hub | rawn1s",
-   LoadingTitle = "Hub Interface",
+   Name = "Sakka Hub",
+   LoadingTitle = "Sakka is Loading",
    LoadingSubtitle = "by rawn1s",
    ConfigurationSaving = {
       Enabled = true,
