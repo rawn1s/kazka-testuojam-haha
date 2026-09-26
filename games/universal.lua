@@ -14,7 +14,7 @@ local Window = Rayfield:Window({
       Invite = "noinvite",
       RememberJoins = true
    },
-   KeySystem = true,
+   KeySystem = false,
    KeySettings = {
       Title = "Sakka | Key System",
       Subtitle = "Link Verification",
