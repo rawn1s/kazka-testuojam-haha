@@ -36,7 +36,7 @@ InfoTab:CreateParagraph({
 
 Rayfield:LoadConfiguration()
 
--- 4. Runtime UI Patch: Title customization + Alternative Icon Swapping
+-- 4. Runtime UI Patch: Title customization + Custom Asset IDs & Tinting
 task.spawn(function()
     task.wait(0.8) -- Allow Rayfield elements to fully mount
     
@@ -55,13 +55,15 @@ task.spawn(function()
                     end)
                 end
                 
-                -- Try alternative verified IDs for topbar buttons
+                -- Apply custom assets and color tints to the Topbar buttons
                 if descendant:IsA("ImageButton") or descendant:IsA("ImageLabel") then
                     if descendant.Parent and descendant.Parent.Name == "Topbar" then
                         if descendant.Name == "Settings" then
-                            descendant.Image = "rbxassetid://6031302932"
+                            descendant.Image = "rbxassetid://119033118248906"
+                            descendant.ImageColor3 = Color3.fromRGB(220, 220, 220) -- Optional tint
                         elseif descendant.Name == "ChangeSize" or descendant.Name == "Hide" then
-                            descendant.Image = "rbxassetid://6035047409"
+                            descendant.Image = "rbxassetid://18955850114"
+                            descendant.ImageColor3 = Color3.fromRGB(220, 220, 220) -- Optional tint
                         end
                     end
                 end
