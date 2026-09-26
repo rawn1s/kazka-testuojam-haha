@@ -36,7 +36,7 @@ InfoTab:CreateParagraph({
 
 Rayfield:LoadConfiguration()
 
--- 4. Runtime UI Patch: Title customization + Precise Asset ID Icon Swapping
+-- 4. Runtime UI Patch: Title customization + Accurate Icon Swapping
 task.spawn(function()
     task.wait(0.8) -- Allow Rayfield elements to fully mount
     
@@ -55,15 +55,13 @@ task.spawn(function()
                     end)
                 end
                 
-                -- Swap only the specific topbar icons safely using their original asset sub-strings
+                -- Surgical icon replacement via precise parent and name checks
                 if descendant:IsA("ImageButton") or descendant:IsA("ImageLabel") then
-                    if descendant.Image ~= "" then
-                        -- Target the Settings icon hash
-                        if string.find(descendant.Image, "80503127983237") then
-                            descendant.Image = "rbxassetid://6031260907" -- Gear icon
-                        -- Target the Minimize/ChangeSize icon hash
-                        elseif string.find(descendant.Image, "10137941941") then
-                            descendant.Image = "rbxassetid://6023426915" -- Dash icon (-)
+                    if descendant.Parent and descendant.Parent.Name == "Topbar" then
+                        if descendant.Name == "Settings" then
+                            descendant.Image = "rbxassetid://6031260907" -- Phone-style gear icon
+                        elseif descendant.Name == "ChangeSize" or descendant.Name == "Hide" then
+                            descendant.Image = "rbxassetid://6023426915" -- Clean dash icon (-)
                         end
                     end
                 end
