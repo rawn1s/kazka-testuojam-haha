@@ -1,6 +1,8 @@
+-- 1. Load the Rayfield Library properly
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local Window = Rayfield:Window({
+-- 2. Create the Main Window using the correct Rayfield structure
+local Window = Rayfield:CreateWindow({
    Name = "Sakka Hub",
    LoadingTitle = "Sakka is loading...",
    LoadingSubtitle = "by rawn1s",
@@ -9,35 +11,24 @@ local Window = Rayfield:Window({
       FolderName = "SakkaHub",
       FileName = "UniversalConfig"
    },
-   KeySystem = false,
+   KeySystem = false, -- Disabled
 })
 
+-- 3. Create the Tabs
 local InfoTab = Window:CreateTab("Information", "info")
 local HiderTab = Window:CreateTab("Hider", "ghost")
 local SeekerTab = Window:CreateTab("Seeker", "crosshair")
 local VisualTab = Window:CreateTab("Visuals", "eye")
 
-
+-- 4. Add test content to Info Tab
 local InfoSection = InfoTab:CreateSection("Hub Details")
 
 InfoTab:CreateParagraph({
    Title = "Welcome to Sakka",
-   Content = "Sakka Hub is active and running. Select a tab on the left depending on what role or game features you want to use."
+   Content = "Sakka Hub is active and running successfully!"
 })
 
-InfoTab:CreateButton({
-   Name = "Copy Discord Link",
-   Callback = function()
-      if setclipboard then
-         setclipboard("https://discord.gg/yourinvite")
-         Rayfield:Notify({Title = "Copied!", Content = "Discord invite copied to clipboard.", Duration = 3})
-      end
-   end,
-})
-
-
-local HiderSection = HiderTab:CreateSection("Hider Powers")
-
+-- 5. Add test toggle to Hider Tab
 HiderTab:CreateToggle({
    Name = "Auto Hide",
    Info = "Automatically triggers hiding mechanics.",
@@ -48,33 +39,5 @@ HiderTab:CreateToggle({
    end,
 })
 
-HiderTab:CreateButton({
-   Name = "Inf Health (Example)",
-   Callback = function()
-      print("Inf Health button clicked!")
-      
-      Rayfield:Notify({
-         Title = "Success",
-         Content = "Client-side health modified.",
-         Duration = 3,
-      })
-   end,
-})
-
-
-local VisualSection = VisualTab:CreateSection("ESP & Lighting")
-
-VisualTab:CreateToggle({
-   Name = "Fullbright",
-   Info = "Removes shadows and brightens the map.",
-   CurrentValue = false,
-   Flag = "FullbrightFlag",
-   Callback = function(Value)
-      if Value then
-         game:GetService("Lighting").Brightness = 2
-         game:GetService("Lighting").ClockTime = 14
-      else
-         game:GetService("Lighting").Brightness = 1
-      end
-   end,
-})
+-- Initialize Rayfield elements
+Rayfield:LoadConfiguration()
