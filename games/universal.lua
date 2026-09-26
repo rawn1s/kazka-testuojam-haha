@@ -2,41 +2,40 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:Window({
    Name = "Sakka Hub",
-   LoadingTitle = "Sakka is Loading",
+   LoadingTitle = "Sakka is loading...",
    LoadingSubtitle = "by rawn1s",
    ConfigurationSaving = {
       Enabled = true,
-      FolderName = "RawnHubConfig",
-      FileName = "UniversalHub"
+      FolderName = "SakkaHubConfig",
+      FileName = "SakkaHub"
    },
    Discord = {
       Enabled = false,
       Invite = "noinvite",
       RememberJoins = true
    },
-   KeySystem = true, -- Set this to true to enable key system
+   KeySystem = true,
    KeySettings = {
-      Title = "Key System",
-      Subtitle = "Monetization Gateway",
-      Note = "Get your key from Linkvertise/Loot-Link",
-      FileName = "RawnKey",
+      Title = "Sakka | Key System",
+      Subtitle = "Link Verification",
+      Note = "Complete the Platoboost link to get your unique key.",
+      FileName = "SakkaPlatoKey",
       SaveKey = true,
-      GrabKeyFromSite = false, -- Set to true if you host the key on a raw pastebin link
-      Key = {"YOUR_SECRET_KEY_123"} -- The correct key(s) users need to enter
+      GrabKeyFromSite = false,
+      Key = {"https://gateway.platoboost.com/a/YOUR_PROJECT_ID"} -- Replace with actual Platoboost service link/endpoint provided by their dashboard
    }
 })
 
-local MainTab = Window:CreateTab("Universal", 4483345998) -- Title, Icon ID
-
-local MainSection = MainTab:CreateSection("Main Features")
+-- Main UI content once verified
+local MainTab = Window:CreateTab("Universal", 4483345998)
+local MainSection = MainTab:CreateSection("Sakka Core Features")
 
 MainTab:CreateButton({
-   Name = "Print Hello",
+   Name = "Test Notification",
    Callback = function()
-      print("Rayfield button clicked!")
       Rayfield:Notify({
-         Title = "Success!",
-         Content = "You have successfully executed the script.",
+         Title = "Sakka Hub",
+         Content = "Key verified successfully via Platoboost!",
          Duration = 6.5,
          Image = 4483345998,
       })
