@@ -36,7 +36,7 @@ InfoTab:CreateParagraph({
 
 Rayfield:LoadConfiguration()
 
--- 4. Runtime UI Patch: Title customization only (leaving topbar defaults intact)
+-- 4. Runtime UI Patch: Title Font & Color Customization Only
 task.spawn(function()
     task.wait(0.8) -- Allow Rayfield elements to fully mount
     
@@ -47,9 +47,8 @@ task.spawn(function()
     for _, container in ipairs(containers) do
         pcall(function()
             for _, descendant in ipairs(container:GetDescendants()) do
-                -- Style the title text
                 if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
-                    descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
+                    descendant.TextColor3 = Color3.fromRGB(235, 50, 50) -- Red Accent
                     pcall(function()
                         descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
                     end)
