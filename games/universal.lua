@@ -2,14 +2,14 @@
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- 1. Window Creation with a valid built-in Rayfield theme
-local Window = Rayfield:Window({
+-- 1. Corrected method: CreateWindow instead of Window
+local Window = Rayfield:CreateWindow({
     Name = "Sakka Hub",
     LoadingTitle = "Sakka is loading...",
     LoadingSubtitle = "by rawn1s",
     
-    Theme = "Default", -- Must be a valid string identifier for Rayfield
-    ToggleUIKey = Enum.KeyCode.RightControl,
+    Theme = "Default", 
+    ToggleUIKeybind = "RightControl", -- Updated parameter for Gen2 keybinds
 
     ConfigurationSaving = {
        Enabled = true,
