@@ -2,23 +2,12 @@
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- 1. Window Creation with a Custom Red Accent Theme
+-- 1. Window Creation with a stable built-in theme string
 local Window = Rayfield:CreateWindow({
     Name = "Sakka Hub",
     LoadingTitle = "Sakka is loading...",
     LoadingSubtitle = "by rawn1s",
-    
-    Theme = {
-        TextColor = Color3.fromRGB(255, 255, 255),
-        Background = Color3.fromRGB(18, 18, 18),
-        Topbar = Color3.fromRGB(24, 24, 24),
-        Accent = Color3.fromRGB(235, 50, 50), -- Cool Red Accent
-        Outline = Color3.fromRGB(45, 45, 45),
-        TabBackground = Color3.fromRGB(24, 24, 24),
-        TabStroke = Color3.fromRGB(45, 45, 45),
-        TabTextColor = Color3.fromRGB(200, 200, 200),
-        SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
-    },
+    Theme = "Default", -- Stable built-in theme to prevent nil property crashes
 
     ConfigurationSaving = {
        Enabled = true,
@@ -46,3 +35,15 @@ InfoTab:CreateParagraph({
 })
 
 Rayfield:LoadConfiguration()
+
+-- 4. Runtime UI Patch: Target the title text and set it to a cool red color
+task.spawn(function()
+    task.wait(0.6) -- Allow Rayfield elements to fully mount in CoreGui
+    
+    for _, descendant in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+        -- Find the text label matching our window name and apply red styling
+        if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
+            descendant.TextColor3 = Color3.fromRGB(235, 50, 50) -- Cool Red Accent
+        end
+    end
+end)
