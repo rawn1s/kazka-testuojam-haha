@@ -36,22 +36,42 @@ InfoTab:CreateParagraph({
 
 Rayfield:LoadConfiguration()
 
--- 4. Runtime UI Patch: Title Customization + Image ID Logger
+-- 4. Multi-Container Runtime UI Scan & Logger
 task.spawn(function()
-    task.wait(0.8) -- Allow Rayfield elements to fully mount
+    task.wait(1) -- Allow Rayfield elements to fully mount
     
-    for _, descendant in ipairs(game:GetService("CoreGui"):GetDescendants()) do
-        -- Style the title text
-        if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
-            descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
-            descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
+    -- Gather all possible root UI containers used by executors
+    local containers = {game:GetService("CoreGui")}
+    
+    pcall(function()
+        if gethui then
+            table.insert(containers, gethui())
         end
-        
-        -- Print out image elements so we can see their exact asset IDs in the F9 console
-        if descendant:IsA("ImageButton") or descendant:IsA("ImageLabel") then
-            if descendant.Image ~= "" then
-                print("Found GUI Image -> Name: " .. descendant.Name .. " | ID: " .. descendant.Image)
+    end)
+    
+    pcall(function()
+        table.insert(containers, game:GetService("Players").LocalPlayer.PlayerGui)
+    end)
+    
+    -- Scan through every container to locate our elements
+    for _, container in ipairs(containers) do
+        pcall(function()
+            for _, descendant in ipairs(container:GetDescendants()) do
+                -- Style the title text if found
+                if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
+                    descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
+                    pcall(function()
+                        descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
+                    end)
+                end
+                
+                -- Log all custom image buttons/labels to find the topbar icons
+                if descendant:IsA("ImageButton") or descendant:IsA("ImageLabel") then
+                    if descendant.Image ~= "" then
+                        print("Found GUI Image -> Name: " .. descendant.Name .. " | Parent: " .. tostring(descendant.Parent.Name) .. " | ID: " .. descendant.Image)
+                    end
+                end
             end
-        end
+        end)
     end
 end)
