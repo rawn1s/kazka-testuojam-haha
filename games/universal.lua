@@ -2,14 +2,14 @@
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- 1. Corrected method: CreateWindow instead of Window
+-- 1. Window Creation with correct Gen2 parameters
 local Window = Rayfield:CreateWindow({
     Name = "Sakka Hub",
     LoadingTitle = "Sakka is loading...",
     LoadingSubtitle = "by rawn1s",
     
     Theme = "Default", 
-    ToggleUIKeybind = "RightControl", -- Updated parameter for Gen2 keybinds
+    ToggleUIKeybind = Enum.KeyCode.K, -- Standard safe KeyCode enum for Gen2
 
     ConfigurationSaving = {
        Enabled = true,
