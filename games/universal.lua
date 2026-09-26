@@ -43,11 +43,7 @@ task.spawn(function()
     for _, descendant in ipairs(game:GetService("CoreGui"):GetDescendants()) do
         if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
             descendant.TextColor3 = Color3.fromRGB(235, 50, 50) -- Cool Red Accent
-            
-            -- Change the font (You can replace Enum.Font.GothamBold with any Roblox font Enum)
-            descendant.FontFace = Font.fromName("rbxassetid://12187365364", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
-            -- Alternatively, using built-in engine enums:
-            -- descendant.FontFace = Font.fromEnum(Enum.Font.GothamBold)
+            descendant.FontFace = Font.fromName(Enum.Font.PermanentMarker)
         end
     end
 end)
