@@ -1,40 +1,41 @@
 -- games/universal.lua
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
--- 1. Window Creation
-local Window = Rayfield:CreateWindow({
-    Name = "Sakka Hub",
-    LoadingTitle = "Sakka is loading...",
-    LoadingSubtitle = "by rawn1s",
-    Theme = "Default",
-
-    ConfigurationSaving = {
-       Enabled = true,
-       FolderName = "SakkaHub",
-       FileName = "UniversalConfig"
-    },
-    
-    Discord = {
-       Enabled = false,
-       Invite = "noinvite",
-       RememberJoins = true
-    },
-    KeySystem = false,
+local Window = Fluent:CreateWindow({
+    Title = "Sakka Hub",
+    SubTitle = "by rawn1s",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(880, 580),
+    Acrylic = true, -- Modern blurred background effect
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
+
+-- Fluent doesn't have a direct permanent marker font built in, 
+-- but we can set up our tabs cleanly.
+local Tabs = {
+    Information = Window:AddTab({ Title = "Information", Icon = "info" }),
+    Farming     = Window:AddTab({ Title = "Farming", Icon = "sword" }),
+    Dungeon     = Window:AddTab({ Title = "Dungeon", Icon = "shield" }),
+    Player      = Window:AddTab({ Title = "Player", Icon = "user" }),
+    Training    = Window:AddTab({ Title = "Training", Icon = "dumbbell" }),
+    Combat      = Window:AddTab({ Title = "Combat", Icon = "swords" }),
+}
+
+local Options = Fluent.Options
 
 -- ==========================================
 -- -- INFORMATION TAB
 -- ==========================================
-local InfoTab = Window:CreateTab("Information", "info")
-InfoTab:CreateSection("Hub Details")
-
-InfoTab:CreateParagraph({
+Tabs.Information:AddParagraph({
     Title = "Greetings",
     Content = "Welcome to Sakka Hub! Active and running successfully."
 })
 
-InfoTab:CreateParagraph({
+Tabs.Information:AddParagraph({
     Title = "Discord Link",
     Content = "discord.gg/sakku"
 })
@@ -43,349 +44,231 @@ InfoTab:CreateParagraph({
 -- ==========================================
 -- -- FARMING TAB
 -- ==========================================
-local FarmingTab = Window:CreateTab("Farming", "swords")
+local FarmingSection1 = Tabs.Farming:AddSection("Mobs / Bosses")
 
-FarmingTab:CreateSection("Mobs / Bosses")
-
-FarmingTab:CreateDropdown({
-    Name = "Boss / NPC Selection",
-    Options = {"Bandit", "Mother Bear", "Boss Placeholder", "Alpha Wolf", "Bandit Leader", "Guard"},
-    CurrentOption = {"Bandit"},
-    MultipleOptions = true,
-    Flag = "BossSelection",
-    Callback = function(Option) end,
+FarmingSection1:AddDropdown("BossSelection", {
+    Title = "Boss / NPC Selection",
+    Values = {"Bandit", "Mother Bear", "Boss Placeholder", "Alpha Wolf", "Bandit Leader", "Guard"},
+    Multi = true,
+    Default = {"Bandit"},
 })
 
-FarmingTab:CreateToggle({
-    Name = "Auto Hop After Boss Kill",
-    CurrentValue = false,
-    Flag = "AutoHopBoss",
-    Callback = function(Value) end,
+FarmingSection1:AddToggle("AutoHopBoss", { Title = "Auto Hop After Boss Kill", Default = false })
+
+FarmingSection1:AddInput("HopSettings1", {
+    Title = "Auto Hop Settings (Players / Region)",
+    Default = "Max Players: 5, Region: US",
+    Placeholder = "Max Players: 5, Region: US",
+    Numeric = false,
+    Finished = true,
 })
 
-FarmingTab:CreateInput({
-    Name = "Auto Hop Settings (Players / Region)",
-    PlaceholderText = "Max Players: 5, Region: US",
-    RemoveTextOnFocusLost = false,
-    Callback = function(Text) end,
+FarmingSection1:AddToggle("AutoCollectChest", { Title = "Auto Collect Chest", Default = false })
+
+
+local FarmingSection2 = Tabs.Farming:AddSection("Weapons / Items")
+
+FarmingSection2:AddDropdown("WeaponDrops", {
+    Title = "Auto Farm Weapon Drops (Priority)",
+    Values = {"Best Available", "Katana", "Spear", "Dagger", "Halberd", "Greatsword"},
+    Multi = true,
+    Default = {"Best Available"},
 })
 
-FarmingTab:CreateToggle({
-    Name = "Auto Collect Chest",
-    CurrentValue = false,
-    Flag = "AutoCollectChest",
-    Callback = function(Value) end,
+FarmingSection2:AddDropdown("ItemDrops", {
+    Title = "Auto Farm Item Drops (Priority)",
+    Values = {"Scroll", "Pouch", "Gem", "Key", "Token", "Crystal"},
+    Multi = true,
+    Default = {"Scroll"},
 })
 
-FarmingTab:CreateSection("Weapons / Items")
+FarmingSection2:AddToggle("AutoHopNoSpawn", { Title = "Auto Hop If Drop NPC Not Spawned", Default = false })
 
-FarmingTab:CreateDropdown({
-    Name = "Auto Farm Weapon Drops (Priority)",
-    Options = {"Best Available", "Katana", "Spear", "Dagger", "Halberd", "Greatsword"},
-    CurrentOption = {"Best Available"},
-    MultipleOptions = true,
-    Flag = "WeaponDrops",
-    Callback = function(Option) end,
+FarmingSection2:AddInput("HopSettings2", {
+    Title = "Auto Hop Settings (Players / Region)",
+    Default = "Max Players: 5, Region: US",
+    Placeholder = "Max Players: 5, Region: US",
+    Numeric = false,
+    Finished = true,
 })
 
-FarmingTab:CreateDropdown({
-    Name = "Auto Farm Item Drops (Priority)",
-    Options = {"Scroll", "Pouch", "Gem", "Key", "Token", "Crystal"},
-    CurrentOption = {"Scroll"},
-    MultipleOptions = true,
-    Flag = "ItemDrops",
-    Callback = function(Option) end,
+
+local FarmingSection3 = Tabs.Farming:AddSection("Quests")
+
+FarmingSection3:AddDropdown("QuestSelection", {
+    Title = "Quest Selection",
+    Values = {"Quest 1: Bandit Sweep", "Quest 2: Boss Extermination"},
+    Multi = false,
+    Default = 1,
 })
 
-FarmingTab:CreateToggle({
-    Name = "Auto Hop If Drop NPC Not Spawned",
-    CurrentValue = false,
-    Flag = "AutoHopNoSpawn",
-    Callback = function(Value) end,
-})
-
-FarmingTab:CreateInput({
-    Name = "Auto Hop Settings (Players / Region)",
-    PlaceholderText = "Max Players: 5, Region: US",
-    RemoveTextOnFocusLost = false,
-    Callback = function(Text) end,
-})
-
-FarmingTab:CreateSection("Quests")
-
-FarmingTab:CreateDropdown({
-    Name = "Quest Selection",
-    Options = {"Quest 1: Bandit Sweep", "Quest 2: Boss Extermination"},
-    CurrentOption = {"Quest 1: Bandit Sweep"},
-    MultipleOptions = false,
-    Flag = "QuestSelection",
-    Callback = function(Option) end,
-})
-
-FarmingTab:CreateToggle({
-    Name = "Auto Hop Servers After Timed Quest",
-    CurrentValue = false,
-    Flag = "AutoHopQuest",
-    Callback = function(Value) end,
-})
+FarmingSection3:AddToggle("AutoHopQuest", { Title = "Auto Hop Servers After Timed Quest", Default = false })
 
 
 -- ==========================================
 -- -- DUNGEON TAB
 -- ==========================================
-local DungeonTab = Window:CreateTab("Dungeon", "shield")
-DungeonTab:CreateSection("Cards")
+local DungeonSection = Tabs.Dungeon:AddSection("Cards")
 
-DungeonTab:CreateToggle({
-    Name = "Auto Pick Card",
-    CurrentValue = false,
-    Flag = "AutoPickCard",
-    Callback = function(Value) end,
+DungeonSection:AddToggle("AutoPickCard", { Title = "Auto Pick Card", Default = false })
+
+DungeonSection:AddDropdown("CardsBlacklist", {
+    Title = "What Cards NOT to Pick",
+    Values = {"Card A", "Card B", "Card C", "Card D", "Card E"},
+    Multi = true,
+    Default = {},
 })
 
-DungeonTab:CreateDropdown({
-    Name = "What Cards NOT to Pick",
-    Options = {"Card A", "Card B", "Card C", "Card D", "Card E"},
-    CurrentOption = {},
-    MultipleOptions = true,
-    Flag = "CardsBlacklist",
-    Callback = function(Value) end,
+DungeonSection:AddDropdown("CardsWhitelist", {
+    Title = "What Cards ALWAYS to Pick",
+    Values = {"Card X", "Card Y", "Card Z"},
+    Multi = true,
+    Default = {},
 })
 
-DungeonTab:CreateDropdown({
-    Name = "What Cards ALWAYS to Pick",
-    Options = {"Card X", "Card Y", "Card Z"},
-    CurrentOption = {},
-    MultipleOptions = true,
-    Flag = "CardsWhitelist",
-    Callback = function(Value) end,
-})
-
-DungeonTab:CreateDropdown({
-    Name = "Card TYPE Priority",
-    Options = {"Damage", "Defense", "Utility", "Speed"},
-    CurrentOption = {"Damage"},
-    MultipleOptions = true,
-    Flag = "CardTypePriority",
-    Callback = function(Value) end,
+DungeonSection:AddDropdown("CardTypePriority", {
+    Title = "Card TYPE Priority",
+    Values = {"Damage", "Defense", "Utility", "Speed"},
+    Multi = true,
+    Default = {"Damage"},
 })
 
 
 -- ==========================================
 -- -- PLAYER TAB
 -- ==========================================
-local PlayerTab = Window:CreateTab("Player", "user")
-PlayerTab:CreateSection("Movement")
+local PlayerSection = Tabs.Player:AddSection("Movement")
 
-PlayerTab:CreateToggle({
-    Name = "Noclip",
-    CurrentValue = false,
-    Flag = "Noclip",
-    Callback = function(Value) end,
+PlayerSection:AddToggle("Noclip", { Title = "Noclip", Default = false })
+PlayerSection:AddToggle("HighJumpToggle", { Title = "High Jump", Default = false })
+
+PlayerSection:AddSlider("HighJumpHeight", {
+    Title = "High Jump Height (Studs)",
+    Description = "Adjust jump velocity height",
+    Default = 25,
+    Min = 10,
+    Max = 100,
+    Rounding = 0,
+    Suffix = " studs"
 })
 
-PlayerTab:CreateToggle({
-    Name = "High Jump",
-    CurrentValue = false,
-    Flag = "HighJumpToggle",
-    Callback = function(Value) end,
+PlayerSection:AddSlider("UnlimitedFOV", {
+    Title = "Unlimited FOV",
+    Default = 90,
+    Min = 70,
+    Max = 120,
+    Rounding = 0,
+    Suffix = "°"
 })
 
-PlayerTab:CreateSlider({
-    Name = "High Jump Height (Studs)",
-    Range = {10, 100},
-    Increment = 5,
-    Suffix = " studs",
-    CurrentValue = 25,
-    Flag = "HighJumpHeight",
-    Callback = function(Value) end,
-})
-
-PlayerTab:CreateSlider({
-    Name = "Unlimited FOV",
-    Range = {70, 120},
-    Increment = 1,
-    Suffix = "°",
-    CurrentValue = 90,
-    Flag = "UnlimitedFOV",
-    Callback = function(Value) end,
-})
-
-PlayerTab:CreateSlider({
-    Name = "Movement Speed",
-    Range = {16, 100},
-    Increment = 1,
-    Suffix = " spd",
-    CurrentValue = 16,
-    Flag = "MovementSpeed",
-    Callback = function(Value) end,
+PlayerSection:AddSlider("MovementSpeed", {
+    Title = "Movement Speed",
+    Default = 16,
+    Min = 16,
+    Max = 100,
+    Rounding = 0,
+    Suffix = " spd"
 })
 
 
 -- ==========================================
 -- -- TRAINING TAB
 -- ==========================================
-local TrainingTab = Window:CreateTab("Training", "dumbbell")
+local TrainingSection1 = Tabs.Training:AddSection("Dojo Drills")
+TrainingSection1:AddToggle("AutoPushUps", { Title = "Auto Push Ups", Default = false })
+TrainingSection1:AddToggle("AutoMeditation", { Title = "Auto Meditation", Default = false })
+TrainingSection1:AddToggle("AutoSquats", { Title = "Auto Squats", Default = false })
+TrainingSection1:AddToggle("AutoBoulderSplit", { Title = "Auto Boulder Split", Default = false })
+TrainingSection1:AddToggle("AutoBoulderPush", { Title = "Auto Boulder Push", Default = false })
+TrainingSection1:AddToggle("InstantTraining", { Title = "Instant Training Complete", Default = false })
 
-TrainingTab:CreateSection("Dojo Drills")
-TrainingTab:CreateToggle({Name = "Auto Push Ups", CurrentValue = false, Callback = function() end})
-TrainingTab:CreateToggle({Name = "Auto Meditation", CurrentValue = false, Callback = function() end})
-TrainingTab:CreateToggle({Name = "Auto Squats", CurrentValue = false, Callback = function() end})
-TrainingTab:CreateToggle({Name = "Auto Boulder Split", CurrentValue = false, Callback = function() end})
-TrainingTab:CreateToggle({Name = "Auto Boulder Push", CurrentValue = false, Callback = function() end})
-TrainingTab:CreateToggle({Name = "Instant Training Complete", CurrentValue = false, Callback = function() end})
+local TrainingSection2 = Tabs.Training:AddSection("Auto Skill Tree")
+TrainingSection2:AddParagraph({ Title = "Skill Points Balance", Content = "Current Unspent Skill Points: 0 SP" })
+TrainingSection2:AddToggle("AutoAllocateSP", { Title = "Auto Allocate Skill Points on Level Up", Default = false })
 
-TrainingTab:CreateSection("Auto Skill Tree")
-TrainingTab:CreateParagraph({
-    Title = "Skill Points Balance",
-    Content = "Current Unspent Skill Points: 0 SP"
+TrainingSection2:AddDropdown("AllocationPriority", {
+    Title = "Allocation Priority",
+    Values = {"Max Health Focus", "Damage Focus", "Stamina Focus", "Balanced"},
+    Multi = false,
+    Default = 4,
 })
 
-TrainingTab:CreateToggle({
-    Name = "Auto Allocate Skill Points on Level Up",
-    CurrentValue = false,
-    Callback = function(Value) end,
-})
-
-TrainingTab:CreateDropdown({
-    Name = "Allocation Priority",
-    Options = {"Max Health Focus", "Damage Focus", "Stamina Focus", "Balanced"},
-    CurrentOption = {"Balanced"},
-    MultipleOptions = false,
-    Callback = function(Option) end,
-})
-
-TrainingTab:CreateButton({
-    Name = "Allocate All Available Skill Points Now",
-    Callback = function() end,
+TrainingSection2:AddButton({
+    Title = "Allocate All Available Skill Points Now",
+    Callback = function() end
 })
 
 
 -- ==========================================
 -- -- COMBAT TAB
 -- ==========================================
-local CombatTab = Window:CreateTab("Combat", "swords")
+local CombatSection1 = Tabs.Combat:AddSection("Offense")
 
-CombatTab:CreateSection("Offense")
-CombatTab:CreateSlider({
-    Name = "Kill Aura Range (Studs)",
-    Range = {0, 50},
-    Increment = 1,
-    Suffix = " studs",
-    CurrentValue = 0,
-    Callback = function(Value) end,
+CombatSection1:AddSlider("KillAuraRange", {
+    Title = "Kill Aura Range (Studs)",
+    Default = 0,
+    Min = 0,
+    Max = 50,
+    Rounding = 0,
+    Suffix = " studs"
 })
 
-CombatTab:CreateToggle({Name = "Auto Attack", CurrentValue = false, Callback = function() end})
+CombatSection1:AddToggle("AutoAttack", { Title = "Auto Attack", Default = false })
 
-CombatTab:CreateSlider({
-    Name = "AA Speed",
-    Range = {1, 10},
-    Increment = 0.5,
-    Suffix = "x",
-    CurrentValue = 1,
-    Callback = function(Value) end,
+CombatSection1:AddSlider("AASpeed", {
+    Title = "AA Speed",
+    Default = 1,
+    Min = 1,
+    Max = 10,
+    Rounding = 1,
+    Suffix = "x"
 })
 
-CombatTab:CreateDropdown({
-    Name = "Equip Weapon",
-    Options = {"Weapon 1", "Weapon 2"},
-    CurrentOption = {"Weapon 1"},
-    Callback = function() end,
+CombatSection1:AddDropdown("EquipWeapon", {
+    Title = "Equip Weapon",
+    Values = {"Weapon 1", "Weapon 2"},
+    Multi = false,
+    Default = 1,
 })
 
-CombatTab:CreateDropdown({
-    Name = "Auto Skills",
-    Options = {"Skill A", "Skill B", "Skill C"},
-    CurrentOption = {},
-    MultipleOptions = true,
-    Callback = function() end,
+CombatSection1:AddDropdown("AutoSkills", {
+    Title = "Auto Skills",
+    Values = {"Skill A", "Skill B", "Skill C"},
+    Multi = true,
+    Default = {},
 })
 
-CombatTab:CreateToggle({Name = "TP All Mobs to Person", CurrentValue = false, Callback = function() end})
+CombatSection1:AddToggle("TPAllMobs", { Title = "TP All Mobs to Person", Default = false })
 
-CombatTab:CreateSection("Defense")
-CombatTab:CreateToggle({
-    Name = "Enemy Hitboxes",
-    CurrentValue = false,
-    Callback = function(Value) end,
+local CombatSection2 = Tabs.Combat:AddSection("Defense")
+
+CombatSection2:AddToggle("EnemyHitboxes", { Title = "Enemy Hitboxes", Default = false })
+
+CombatSection2:AddSlider("ExpandHitboxes", {
+    Title = "Expand Enemy Hitboxes (Studs)",
+    Default = 2,
+    Min = 2,
+    Max = 20,
+    Rounding = 0,
+    Suffix = " studs"
 })
 
-CombatTab:CreateSlider({
-    Name = "Expand Enemy Hitboxes (Studs)",
-    Range = {2, 20},
-    Increment = 1,
-    Suffix = " studs",
-    CurrentValue = 2,
-    Callback = function(Value) end,
+CombatSection2:AddToggle("AutoParry", { Title = "Auto Parry / Block", Default = false })
+
+
+-- Set up configuration saving & theme management
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("SakkaHub")
+SaveManager:SetFolder("SakkaHub/configs")
+SaveManager:BuildConfigSection(Tabs.Information)
+InterfaceManager:SetupWindow(Tabs.Information)
+
+Window:SelectTab(1)
+Fluent:Notify({
+    Title = "Sakka Hub",
+    Content = "Fluent UI loaded successfully!",
+    Duration = 5
 })
-
-CombatTab:CreateToggle({
-    Name = "Auto Parry / Block",
-    CurrentValue = false,
-    Callback = function(Value) end,
-})
-
-
-Rayfield:LoadConfiguration()
-
--- ==========================================
--- 4. INSTANT, ZERO-LAG UI OPTIMIZATION ENGINE
--- ==========================================
-task.spawn(function()
-    task.wait(0.5)
-    local containers = {game:GetService("CoreGui")}
-    pcall(function() if gethui then table.insert(containers, gethui()) end end)
-    pcall(function() table.insert(containers, game:GetService("Players").LocalPlayer.PlayerGui) end)
-    
-    for _, container in ipairs(containers) do
-        pcall(function()
-            for _, descendant in ipairs(container:GetDescendants()) do
-                -- 1. Title Customization (Left aligned correctly)
-                if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
-                    descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
-                    descendant.TextXAlignment = Enum.TextXAlignment.Left
-                    pcall(function()
-                        descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
-                    end)
-                end
-
-                -- 2. Expand Main Window Size
-                if descendant.Name == "Main" and descendant:IsA("Frame") then
-                    descendant.Size = UDim2.new(0, 880, 0, 580)
-                end
-
-                -- 3. Left-Align Information Tab Content under Hub Details
-                if descendant:IsA("TextLabel") and (descendant.Text == "Greetings" or descendant.Text == "Discord Link" or descendant.Text:find("Welcome to Sakka") or descendant.Text:find("discord.gg")) then
-                    descendant.TextXAlignment = Enum.TextXAlignment.Left
-                    if descendant.Parent and descendant.Parent:IsA("GuiObject") then
-                        descendant.Parent.AnchorPoint = Vector2.new(0, 0)
-                        descendant.Parent.Position = UDim2.new(0, 10, descendant.Parent.Position.Y.Scale, descendant.Parent.Position.Y.Offset)
-                    end
-                end
-
-                -- 4. Instant Toggle Color Fix (Using PropertyChangedSignal for zero latency/lag)
-                if descendant:IsA("Frame") and (descendant.Name == "Toggle" or descendant.Name == "Switch" or descendant.Name == "Indicator" or descendant.Name == "State") then
-                    if descendant.BackgroundColor3.B > descendant.BackgroundColor3.R then
-                        descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
-                    end
-                    descendant:GetPropertyChangedSignal("BackgroundColor3"):Connect(function()
-                        if descendant.BackgroundColor3.B > descendant.BackgroundColor3.R then
-                            descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
-                        end
-                    end)
-                end
-
-                -- 5. Fix chunky Sliders & Left-Bound Overflow
-                if descendant:IsA("Frame") and (descendant.Name == "Slider" or descendant.Name == "SliderBar" or descendant.Name == "Fill") then
-                    if descendant.Size.X.Scale > 0 or descendant.Size.X.Offset > 150 then
-                        -- Keep them streamlined and constrained within bounds
-                        pcall(function()
-                            descendant.ClipsDescendants = true
-                        end)
-                    end
-                end
-            end
-        end)
-    end
-end)
