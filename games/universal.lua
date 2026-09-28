@@ -330,10 +330,10 @@ CombatTab:CreateToggle({
 Rayfield:LoadConfiguration()
 
 -- ==========================================
--- 4. ROBUST RUNTIME UI PATCH & RECONFIGURATION ENGINE
+-- 4. INSTANT, ZERO-LAG UI OPTIMIZATION ENGINE
 -- ==========================================
 task.spawn(function()
-    task.wait(0.8)
+    task.wait(0.5)
     local containers = {game:GetService("CoreGui")}
     pcall(function() if gethui then table.insert(containers, gethui()) end end)
     pcall(function() table.insert(containers, game:GetService("Players").LocalPlayer.PlayerGui) end)
@@ -341,7 +341,7 @@ task.spawn(function()
     for _, container in ipairs(containers) do
         pcall(function()
             for _, descendant in ipairs(container:GetDescendants()) do
-                -- 1. Fix Title alignment (Left aligned properly without shifting layout)
+                -- 1. Title Customization (Left aligned correctly)
                 if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
                     descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
                     descendant.TextXAlignment = Enum.TextXAlignment.Left
@@ -350,29 +350,42 @@ task.spawn(function()
                     end)
                 end
 
-                -- 2. Expand Main Window Size & Container width
+                -- 2. Expand Main Window Size
                 if descendant.Name == "Main" and descendant:IsA("Frame") then
                     descendant.Size = UDim2.new(0, 880, 0, 580)
+                end
+
+                -- 3. Left-Align Information Tab Content under Hub Details
+                if descendant:IsA("TextLabel") and (descendant.Text == "Greetings" or descendant.Text == "Discord Link" or descendant.Text:find("Welcome to Sakka") or descendant.Text:find("discord.gg")) then
+                    descendant.TextXAlignment = Enum.TextXAlignment.Left
+                    if descendant.Parent and descendant.Parent:IsA("GuiObject") then
+                        descendant.Parent.AnchorPoint = Vector2.new(0, 0)
+                        descendant.Parent.Position = UDim2.new(0, 10, descendant.Parent.Position.Y.Scale, descendant.Parent.Position.Y.Offset)
+                    end
+                end
+
+                -- 4. Instant Toggle Color Fix (Using PropertyChangedSignal for zero latency/lag)
+                if descendant:IsA("Frame") and (descendant.Name == "Toggle" or descendant.Name == "Switch" or descendant.Name == "Indicator" or descendant.Name == "State") then
+                    if descendant.BackgroundColor3.B > descendant.BackgroundColor3.R then
+                        descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
+                    end
+                    descendant:GetPropertyChangedSignal("BackgroundColor3"):Connect(function()
+                        if descendant.BackgroundColor3.B > descendant.BackgroundColor3.R then
+                            descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
+                        end
+                    end)
+                end
+
+                -- 5. Fix chunky Sliders & Left-Bound Overflow
+                if descendant:IsA("Frame") and (descendant.Name == "Slider" or descendant.Name == "SliderBar" or descendant.Name == "Fill") then
+                    if descendant.Size.X.Scale > 0 or descendant.Size.X.Offset > 150 then
+                        -- Keep them streamlined and constrained within bounds
+                        pcall(function()
+                            descendant.ClipsDescendants = true
+                        end)
+                    end
                 end
             end
         end)
     end
-
-    -- 3. Continuous Monitoring Loop for Toggles (Keeps them Red permanently even when clicked)
-    task.spawn(function()
-        while true do
-            task.wait(0.3)
-            pcall(function()
-                for _, container in ipairs(containers) do
-                    for _, descendant in ipairs(container:GetDescendants()) do
-                        if descendant:IsA("Frame") and (descendant.Name == "Toggle" or descendant.Name == "Switch" or descendant.Name == "Indicator" or descendant.Name == "State") then
-                            if descendant.BackgroundColor3.B > descendant.BackgroundColor3.R then
-                                descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end)
 end)
