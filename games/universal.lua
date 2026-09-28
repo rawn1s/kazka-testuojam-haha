@@ -3,11 +3,12 @@
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 
--- Force Fluent accent to Red immediately
-if Fluent.Theme then
-    Fluent.Theme.Accent = Color3.fromRGB(235, 50, 50)
-    Fluent.Theme.DarkAccent = Color3.fromRGB(180, 30, 30)
-end
+-- Safe native accent adjustment
+pcall(function()
+    if Fluent.Themes then
+        Fluent.Themes.Dark.Accent = Color3.fromRGB(235, 50, 50)
+    end
+end)
 
 local Window = Fluent:CreateWindow({
     Title = "Sakka",
@@ -273,6 +274,6 @@ SaveManager:BuildConfigSection(Tabs.Settings)
 Window:SelectTab(1)
 Fluent:Notify({
     Title = "Sakka",
-    Content = "Successfully loaded with red accents & working config!",
+    Content = "Successfully loaded!",
     Duration = 5
 })
