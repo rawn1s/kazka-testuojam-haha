@@ -1,6 +1,6 @@
 -- games/universal.lua
 
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/StyearX/Fluent-modded/main/Main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 
 local Window = Fluent:CreateWindow({
@@ -12,6 +12,16 @@ local Window = Fluent:CreateWindow({
     Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
+
+-- Force Red Accent natively supported by Fluent-modded
+pcall(function()
+    Fluent:SetTheme("Dark")
+    -- Apply red accent override via modded theme properties if available
+    if Fluent.Themes and Fluent.Themes.Dark then
+        Fluent.Themes.Dark.Accent = Color3.fromRGB(235, 50, 50)
+        Fluent.Themes.Dark.DarkAccent = Color3.fromRGB(180, 30, 30)
+    end
+end)
 
 local Tabs = {
     Information = Window:AddTab({ Title = "Information", Icon = "info" }),
@@ -42,7 +52,6 @@ Tabs.Information:AddParagraph({
 -- ==========================================
 -- -- FARMING TAB
 -- ==========================================
--- Utilizing two column layout containers if supported, or structured sections
 local FarmingSection1 = Tabs.Farming:AddSection("Mobs / Bosses")
 
 FarmingSection1:AddDropdown("BossSelection", {
@@ -265,39 +274,9 @@ SaveManager:SetFolder("Sakka")
 SaveManager:SetFolder("Sakka/configs")
 SaveManager:BuildConfigSection(Tabs.Settings)
 
-
--- ==========================================
--- RED ACCENT INJECTOR (TOGGLES & ACTIVE BARS)
--- ==========================================
-task.spawn(function()
-    task.wait(0.4)
-    local containers = {game:GetService("CoreGui")}
-    pcall(function() if gethui then table.insert(containers, gethui()) end end)
-    pcall(function() table.insert(containers, game:GetService("Players").LocalPlayer.PlayerGui) end)
-    
-    local crimsonRed = Color3.fromRGB(235, 50, 50)
-
-    for _, container in ipairs(containers) do
-        pcall(function()
-            for _, descendant in ipairs(container:GetDescendants()) do
-                if descendant:IsA("Frame") or descendant:IsA("TextButton") or descendant:IsA("ImageLabel") then
-                    local col = descendant.BackgroundColor3
-                    -- Target Fluent's active blue toggle tracks, active bullets, and side tab markers
-                    if (col.B > col.R and col.B > col.G and col.B > 0.3) or (col.G < 0.2 and col.R < 0.2 and col.B > 0.4) then
-                        descendant.BackgroundColor3 = crimsonRed
-                    end
-                    if descendant:IsA("ImageLabel") and descendant.ImageColor3.B > descendant.ImageColor3.R then
-                        descendant.ImageColor3 = crimsonRed
-                    end
-                end
-            end
-        end)
-    end
-end)
-
 Window:SelectTab(1)
 Fluent:Notify({
     Title = "Sakka",
-    Content = "Successfully loaded with custom styling!",
+    Content = "Loaded successfully with Fluent-modded & Red accents!",
     Duration = 5
 })
