@@ -330,7 +330,7 @@ CombatTab:CreateToggle({
 Rayfield:LoadConfiguration()
 
 -- ==========================================
--- 4. RUNTIME UI PATCH & CUSTOMIZATION ENGINE
+-- 4. ROBUST RUNTIME UI PATCH & RECONFIGURATION ENGINE
 -- ==========================================
 task.spawn(function()
     task.wait(0.8)
@@ -341,36 +341,38 @@ task.spawn(function()
     for _, container in ipairs(containers) do
         pcall(function()
             for _, descendant in ipairs(container:GetDescendants()) do
-                -- 1. Red Title Styling & Full Left-Alignment Fix
+                -- 1. Fix Title alignment (Left aligned properly without shifting layout)
                 if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
                     descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
                     descendant.TextXAlignment = Enum.TextXAlignment.Left
                     pcall(function()
                         descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
                     end)
-                    -- Adjust parent container if it has center/right padding
-                    if descendant.Parent and descendant.Parent:IsA("GuiObject") then
-                        descendant.Parent.Position = UDim2.new(0, 12, descendant.Parent.Position.Y.Scale, descendant.Parent.Position.Y.Offset)
-                    end
                 end
 
-                -- 2. Expand Main Window Size & Proportional Layout
+                -- 2. Expand Main Window Size & Container width
                 if descendant.Name == "Main" and descendant:IsA("Frame") then
                     descendant.Size = UDim2.new(0, 880, 0, 580)
-                end
-
-                -- 3. Red Toggle Switch Override (Turning blue toggles red)
-                if descendant:IsA("Frame") and (descendant.Name == "Toggle" or descendant.Name == "Switch" or descendant.Name == "Indicator" or descendant.Name == "State") then
-                    if descendant.BackgroundColor3.B > descendant.BackgroundColor3.R then
-                        descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
-                    end
-                end
-
-                -- 4. Dropdown Multi-Selection Text Customization ("Various" -> exact names up to 5 + "...")
-                if descendant:IsA("TextLabel") and descendant.Text == "Various" then
-                    descendant.Text = "Selection..."
                 end
             end
         end)
     end
+
+    -- 3. Continuous Monitoring Loop for Toggles (Keeps them Red permanently even when clicked)
+    task.spawn(function()
+        while true do
+            task.wait(0.3)
+            pcall(function()
+                for _, container in ipairs(containers) do
+                    for _, descendant in ipairs(container:GetDescendants()) do
+                        if descendant:IsA("Frame") and (descendant.Name == "Toggle" or descendant.Name == "Switch" or descendant.Name == "Indicator" or descendant.Name == "State") then
+                            if descendant.BackgroundColor3.B > descendant.BackgroundColor3.R then
+                                descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end)
 end)
