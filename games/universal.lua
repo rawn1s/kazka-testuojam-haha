@@ -5,7 +5,7 @@ local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/d
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
 local Window = Fluent:CreateWindow({
-    Title = "Sakka Hub",
+    Title = "Sakka",
     SubTitle = "by rawn1s",
     TabWidth = 160,
     Size = UDim2.fromOffset(880, 580),
@@ -14,7 +14,17 @@ local Window = Fluent:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Define Tabs (Settings positioned below Combat)
+-- Force Fluent accent color to Red globally
+pcall(function()
+    Fluent:ToggleTheme("Dark")
+    -- Override accent colors to Crimson Red
+    for _, themeName in ipairs({"Accent", "LightAccent", "DarkAccent"}) do
+        if Fluent.Themes and Fluent.Themes[themeName] then
+            Fluent.Themes[themeName] = Color3.fromRGB(235, 50, 50)
+        end
+    end
+end)
+
 local Tabs = {
     Information = Window:AddTab({ Title = "Information", Icon = "info" }),
     Farming     = Window:AddTab({ Title = "Farming", Icon = "sword" }),
@@ -263,54 +273,14 @@ SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({})
-InterfaceManager:SetFolder("SakkaHub")
-SaveManager:SetFolder("SakkaHub/configs")
+InterfaceManager:SetFolder("Sakka")
+SaveManager:SetFolder("Sakka/configs")
 SaveManager:BuildConfigSection(Tabs.Settings)
 InterfaceManager:SetupWindow(Tabs.Settings)
-
-
--- ==========================================
--- INSTANT UI PATCH ENGINE (RED ACCENTS & TITLE)
--- ==========================================
-task.spawn(function()
-    task.wait(0.3)
-    local containers = {game:GetService("CoreGui")}
-    pcall(function() if gethui then table.insert(containers, gethui()) end end)
-    pcall(function() table.insert(containers, game:GetService("Players").LocalPlayer.PlayerGui) end)
-    
-    local redColor = Color3.fromRGB(235, 50, 50)
-
-    for _, container in ipairs(containers) do
-        pcall(function()
-            for _, descendant in ipairs(container:GetDescendants()) do
-                -- 1. Change Window Title text to "Sakka" in Red
-                if descendant:IsA("TextLabel") and (descendant.Text:find("Sakka Hub") or descendant.Text == "Sakka Hub") then
-                    descendant.Text = "Sakka"
-                    descendant.TextColor3 = redColor
-                    descendant.TextXAlignment = Enum.TextXAlignment.Left
-                end
-
-                -- 2. Force Blue Toggles, Tab Indicators, and Active Bars to Red
-                if descendant:IsA("Frame" ) or descendant:IsA("TextButton") or descendant:IsA("ImageLabel") then
-                    -- Check if it matches Fluent's default blue accent range
-                    local col = descendant.BackgroundColor3
-                    if (col.B > col.R and col.B > col.G and col.B > 0.4) or (col.G < 0.2 and col.R < 0.2 and col.B > 0.5) then
-                        descendant.BackgroundColor3 = redColor
-                    end
-                    
-                    -- Check image or active bar colors if applicable
-                    if descendant:IsA("ImageLabel") and descendant.ImageColor3.B > descendant.ImageColor3.R then
-                        descendant.ImageColor3 = redColor
-                    end
-                end
-            end
-        end)
-    end
-end)
 
 Window:SelectTab(1)
 Fluent:Notify({
     Title = "Sakka",
-    Content = "Sakka Hub initialized with red accents!",
+    Content = "Successfully loaded!",
     Duration = 5
 })
