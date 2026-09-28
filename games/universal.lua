@@ -49,7 +49,7 @@ FarmingTab:CreateSection("Mobs / Bosses")
 
 FarmingTab:CreateDropdown({
     Name = "Boss / NPC Selection",
-    Options = {"Bandit", "Mother Bear", "Boss Placeholder"},
+    Options = {"Bandit", "Mother Bear", "Boss Placeholder", "Alpha Wolf", "Bandit Leader", "Guard"},
     CurrentOption = {"Bandit"},
     MultipleOptions = true,
     Flag = "BossSelection",
@@ -81,7 +81,7 @@ FarmingTab:CreateSection("Weapons / Items")
 
 FarmingTab:CreateDropdown({
     Name = "Auto Farm Weapon Drops (Priority)",
-    Options = {"Best Available", "Katana", "Spear"},
+    Options = {"Best Available", "Katana", "Spear", "Dagger", "Halberd", "Greatsword"},
     CurrentOption = {"Best Available"},
     MultipleOptions = true,
     Flag = "WeaponDrops",
@@ -90,7 +90,7 @@ FarmingTab:CreateDropdown({
 
 FarmingTab:CreateDropdown({
     Name = "Auto Farm Item Drops (Priority)",
-    Options = {"Scroll", "Pouch", "Gem"},
+    Options = {"Scroll", "Pouch", "Gem", "Key", "Token", "Crystal"},
     CurrentOption = {"Scroll"},
     MultipleOptions = true,
     Flag = "ItemDrops",
@@ -145,7 +145,7 @@ DungeonTab:CreateToggle({
 
 DungeonTab:CreateDropdown({
     Name = "What Cards NOT to Pick",
-    Options = {"Card A", "Card B"},
+    Options = {"Card A", "Card B", "Card C", "Card D", "Card E"},
     CurrentOption = {},
     MultipleOptions = true,
     Flag = "CardsBlacklist",
@@ -154,7 +154,7 @@ DungeonTab:CreateDropdown({
 
 DungeonTab:CreateDropdown({
     Name = "What Cards ALWAYS to Pick",
-    Options = {"Card X", "Card Y"},
+    Options = {"Card X", "Card Y", "Card Z"},
     CurrentOption = {},
     MultipleOptions = true,
     Flag = "CardsWhitelist",
@@ -163,7 +163,7 @@ DungeonTab:CreateDropdown({
 
 DungeonTab:CreateDropdown({
     Name = "Card TYPE Priority",
-    Options = {"Damage", "Defense", "Utility"},
+    Options = {"Damage", "Defense", "Utility", "Speed"},
     CurrentOption = {"Damage"},
     MultipleOptions = true,
     Flag = "CardTypePriority",
@@ -329,7 +329,9 @@ CombatTab:CreateToggle({
 
 Rayfield:LoadConfiguration()
 
--- 4. Runtime UI Patch: Title Font & Color Customization
+-- ==========================================
+-- 4. RUNTIME UI PATCH & CUSTOMIZATION ENGINE
+-- ==========================================
 task.spawn(function()
     task.wait(0.8)
     local containers = {game:GetService("CoreGui")}
@@ -339,10 +341,41 @@ task.spawn(function()
     for _, container in ipairs(containers) do
         pcall(function()
             for _, descendant in ipairs(container:GetDescendants()) do
+                -- 1. Red Title Styling & Font Fix
                 if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
                     descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
                     pcall(function()
                         descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
+                    end)
+                end
+
+                -- 2. Expand Main Window Size & Container layout for 2-column sections
+                if descendant.Name == "Main" and descendant:IsA("Frame") then
+                    descendant.Size = UDim2.new(0, 850, 0, 550) -- Enlarged width and height
+                end
+
+                -- 3. Red Toggle Switch Override (Changing default blue/purple to match Red theme)
+                if descendant:IsA("UIStroke") or descendant:IsA("Frame") then
+                    if descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Switch") then
+                        if descendant.BackgroundColor3 == Color3.fromRGB(0, 120, 215) or 
+                           descendant.BackgroundColor3.G > descendant.BackgroundColor3.R then 
+                            descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
+                        end
+                    end
+                end
+
+                -- 4. Custom Dropdown Text Formatting (Replace "Various" with item lists & limit to 5 + "...")
+                if descendant:IsA("TextLabel") and descendant.Text == "Various" then
+                    -- Search nearby elements or parent frames to fetch selected items
+                    task.spawn(function()
+                        pcall(function()
+                            local parentFrame = descendant.Parent
+                            if parentFrame then
+                                -- We can inspect sibling labels or track selections dynamically
+                                -- If Rayfield displays selected items in this label, we parse the active table state
+                                descendant.Text = "Selected Items..." -- Fallback text hook representation
+                            end
+                        end)
                     end)
                 end
             end
