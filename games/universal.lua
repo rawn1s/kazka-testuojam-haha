@@ -27,7 +27,7 @@ local Window = Rayfield:CreateWindow({
 -- -- INFORMATION TAB
 -- ==========================================
 local InfoTab = Window:CreateTab("Information", "info")
-local InfoSection = InfoTab:CreateSection("Hub Details")
+InfoTab:CreateSection("Hub Details")
 
 InfoTab:CreateParagraph({
     Title = "Greetings",
@@ -45,10 +45,9 @@ InfoTab:CreateParagraph({
 -- ==========================================
 local FarmingTab = Window:CreateTab("Farming", "swords")
 
--- --- Mobs / Bosses Section
-local MobsSection = FarmingTab:CreateSection("Mobs / Bosses")
+FarmingTab:CreateSection("Mobs / Bosses")
 
-MobsSection:CreateDropdown({
+FarmingTab:CreateDropdown({
     Name = "Boss / NPC Selection",
     Options = {"Bandit", "Mother Bear", "Boss Placeholder"},
     CurrentOption = {"Bandit"},
@@ -57,31 +56,30 @@ MobsSection:CreateDropdown({
     Callback = function(Option) end,
 })
 
-MobsSection:CreateToggle({
+FarmingTab:CreateToggle({
     Name = "Auto Hop After Boss Kill",
     CurrentValue = false,
     Flag = "AutoHopBoss",
     Callback = function(Value) end,
 })
 
-MobsSection:CreateInput({
+FarmingTab:CreateInput({
     Name = "Auto Hop Settings (Players / Region)",
     PlaceholderText = "Max Players: 5, Region: US",
     RemoveTextOnFocusLost = false,
     Callback = function(Text) end,
 })
 
-MobsSection:CreateToggle({
+FarmingTab:CreateToggle({
     Name = "Auto Collect Chest",
     CurrentValue = false,
     Flag = "AutoCollectChest",
     Callback = function(Value) end,
 })
 
--- --- Weapons / Items Section
-local WeaponsSection = FarmingTab:CreateSection("Weapons / Items")
+FarmingTab:CreateSection("Weapons / Items")
 
-WeaponsSection:CreateDropdown({
+FarmingTab:CreateDropdown({
     Name = "Auto Farm Weapon Drops (Priority)",
     Options = {"Best Available", "Katana", "Spear"},
     CurrentOption = {"Best Available"},
@@ -90,7 +88,7 @@ WeaponsSection:CreateDropdown({
     Callback = function(Option) end,
 })
 
-WeaponsSection:CreateDropdown({
+FarmingTab:CreateDropdown({
     Name = "Auto Farm Item Drops (Priority)",
     Options = {"Scroll", "Pouch", "Gem"},
     CurrentOption = {"Scroll"},
@@ -99,24 +97,23 @@ WeaponsSection:CreateDropdown({
     Callback = function(Option) end,
 })
 
-WeaponsSection:CreateToggle({
+FarmingTab:CreateToggle({
     Name = "Auto Hop If Drop NPC Not Spawned",
     CurrentValue = false,
     Flag = "AutoHopNoSpawn",
     Callback = function(Value) end,
 })
 
-WeaponsSection:CreateInput({
+FarmingTab:CreateInput({
     Name = "Auto Hop Settings (Players / Region)",
     PlaceholderText = "Max Players: 5, Region: US",
     RemoveTextOnFocusLost = false,
     Callback = function(Text) end,
 })
 
--- --- Quests Section
-local QuestsSection = FarmingTab:CreateSection("Quests")
+FarmingTab:CreateSection("Quests")
 
-QuestsSection:CreateDropdown({
+FarmingTab:CreateDropdown({
     Name = "Quest Selection",
     Options = {"Quest 1: Bandit Sweep", "Quest 2: Boss Extermination"},
     CurrentOption = {"Quest 1: Bandit Sweep"},
@@ -125,7 +122,7 @@ QuestsSection:CreateDropdown({
     Callback = function(Option) end,
 })
 
-QuestsSection:CreateToggle({
+FarmingTab:CreateToggle({
     Name = "Auto Hop Servers After Timed Quest",
     CurrentValue = false,
     Flag = "AutoHopQuest",
@@ -137,16 +134,16 @@ QuestsSection:CreateToggle({
 -- -- DUNGEON TAB
 -- ==========================================
 local DungeonTab = Window:CreateTab("Dungeon", "shield")
-local CardsSection = DungeonTab:CreateSection("Cards")
+DungeonTab:CreateSection("Cards")
 
-CardsSection:CreateToggle({
+DungeonTab:CreateToggle({
     Name = "Auto Pick Card",
     CurrentValue = false,
     Flag = "AutoPickCard",
     Callback = function(Value) end,
 })
 
-CardsSection:CreateDropdown({
+DungeonTab:CreateDropdown({
     Name = "What Cards NOT to Pick",
     Options = {"Card A", "Card B"},
     CurrentOption = {},
@@ -155,7 +152,7 @@ CardsSection:CreateDropdown({
     Callback = function(Option) end,
 })
 
-CardsSection:CreateDropdown({
+DungeonTab:CreateDropdown({
     Name = "What Cards ALWAYS to Pick",
     Options = {"Card X", "Card Y"},
     CurrentOption = {},
@@ -164,7 +161,7 @@ CardsSection:CreateDropdown({
     Callback = function(Option) end,
 })
 
-CardsSection:CreateDropdown({
+DungeonTab:CreateDropdown({
     Name = "Card TYPE Priority",
     Options = {"Damage", "Defense", "Utility"},
     CurrentOption = {"Damage"},
@@ -178,23 +175,23 @@ CardsSection:CreateDropdown({
 -- -- PLAYER TAB
 -- ==========================================
 local PlayerTab = Window:CreateTab("Player", "user")
-local MovementSection = PlayerTab:CreateSection("Movement")
+PlayerTab:CreateSection("Movement")
 
-MovementSection:CreateToggle({
+PlayerTab:CreateToggle({
     Name = "Noclip",
     CurrentValue = false,
     Flag = "Noclip",
     Callback = function(Value) end,
 })
 
-MovementSection:CreateToggle({
+PlayerTab:CreateToggle({
     Name = "High Jump",
     CurrentValue = false,
     Flag = "HighJumpToggle",
     Callback = function(Value) end,
 })
 
-MovementSection:CreateSlider({
+PlayerTab:CreateSlider({
     Name = "High Jump Height (Studs)",
     Range = {10, 100},
     Increment = 5,
@@ -204,7 +201,7 @@ MovementSection:CreateSlider({
     Callback = function(Value) end,
 })
 
-MovementSection:CreateSlider({
+PlayerTab:CreateSlider({
     Name = "Unlimited FOV",
     Range = {70, 120},
     Increment = 1,
@@ -214,7 +211,7 @@ MovementSection:CreateSlider({
     Callback = function(Value) end,
 })
 
-MovementSection:CreateSlider({
+PlayerTab:CreateSlider({
     Name = "Movement Speed",
     Range = {16, 100},
     Increment = 1,
@@ -230,31 +227,27 @@ MovementSection:CreateSlider({
 -- ==========================================
 local TrainingTab = Window:CreateTab("Training", "dumbbell")
 
--- --- Dojo Drills Section
-local DrillsSection = TrainingTab:CreateSection("Dojo Drills")
+TrainingTab:CreateSection("Dojo Drills")
+TrainingTab:CreateToggle({Name = "Auto Push Ups", CurrentValue = false, Callback = function() end})
+TrainingTab:CreateToggle({Name = "Auto Meditation", CurrentValue = false, Callback = function() end})
+TrainingTab:CreateToggle({Name = "Auto Squats", CurrentValue = false, Callback = function() end})
+TrainingTab:CreateToggle({Name = "Auto Boulder Split", CurrentValue = false, Callback = function() end})
+TrainingTab:CreateToggle({Name = "Auto Boulder Push", CurrentValue = false, Callback = function() end})
+TrainingTab:CreateToggle({Name = "Instant Training Complete", CurrentValue = false, Callback = function() end})
 
-DrillsSection:CreateToggle({Name = "Auto Push Ups", CurrentValue = false, Callback = function() end})
-DrillsSection:CreateToggle({Name = "Auto Meditation", CurrentValue = false, Callback = function() end})
-DrillsSection:CreateToggle({Name = "Auto Squats", CurrentValue = false, Callback = function() end})
-DrillsSection:CreateToggle({Name = "Auto Boulder Split", CurrentValue = false, Callback = function() end})
-DrillsSection:CreateToggle({Name = "Auto Boulder Push", CurrentValue = false, Callback = function() end})
-DrillsSection:CreateToggle({Name = "Instant Training Complete", CurrentValue = false, Callback = function() end})
-
--- --- Auto Skill Tree Section
-local SkillTreeSection = TrainingTab:CreateSection("Auto Skill Tree")
-
-SkillTreeSection:CreateParagraph({
+TrainingTab:CreateSection("Auto Skill Tree")
+TrainingTab:CreateParagraph({
     Title = "Skill Points Balance",
     Content = "Current Unspent Skill Points: 0 SP"
 })
 
-SkillTreeSection:CreateToggle({
+TrainingTab:CreateToggle({
     Name = "Auto Allocate Skill Points on Level Up",
     CurrentValue = false,
     Callback = function(Value) end,
 })
 
-SkillTreeSection:CreateDropdown({
+TrainingTab:CreateDropdown({
     Name = "Allocation Priority",
     Options = {"Max Health Focus", "Damage Focus", "Stamina Focus", "Balanced"},
     CurrentOption = {"Balanced"},
@@ -262,7 +255,7 @@ SkillTreeSection:CreateDropdown({
     Callback = function(Option) end,
 })
 
-SkillTreeSection:CreateButton({
+TrainingTab:CreateButton({
     Name = "Allocate All Available Skill Points Now",
     Callback = function() end,
 })
@@ -273,10 +266,8 @@ SkillTreeSection:CreateButton({
 -- ==========================================
 local CombatTab = Window:CreateTab("Combat", "swords")
 
--- --- Offense Section
-local OffenseSection = CombatTab:CreateSection("Offense")
-
-OffenseSection:CreateSlider({
+CombatTab:CreateSection("Offense")
+CombatTab:CreateSlider({
     Name = "Kill Aura Range (Studs)",
     Range = {0, 50},
     Increment = 1,
@@ -285,9 +276,9 @@ OffenseSection:CreateSlider({
     Callback = function(Value) end,
 })
 
-OffenseSection:CreateToggle({Name = "Auto Attack", CurrentValue = false, Callback = function() end})
+CombatTab:CreateToggle({Name = "Auto Attack", CurrentValue = false, Callback = function() end})
 
-OffenseSection:CreateSlider({
+CombatTab:CreateSlider({
     Name = "AA Speed",
     Range = {1, 10},
     Increment = 0.5,
@@ -296,14 +287,14 @@ OffenseSection:CreateSlider({
     Callback = function(Value) end,
 })
 
-OffenseSection:CreateDropdown({
+CombatTab:CreateDropdown({
     Name = "Equip Weapon",
     Options = {"Weapon 1", "Weapon 2"},
     CurrentOption = {"Weapon 1"},
     Callback = function() end,
 })
 
-OffenseSection:CreateDropdown({
+CombatTab:CreateDropdown({
     Name = "Auto Skills",
     Options = {"Skill A", "Skill B", "Skill C"},
     CurrentOption = {},
@@ -311,18 +302,16 @@ OffenseSection:CreateDropdown({
     Callback = function() end,
 })
 
-OffenseSection:CreateToggle({Name = "TP All Mobs to Person", CurrentValue = false, Callback = function() end})
+CombatTab:CreateToggle({Name = "TP All Mobs to Person", CurrentValue = false, Callback = function() end})
 
--- --- Defense Section
-local DefenseSection = CombatTab:CreateSection("Defense")
-
-DefenseSection:CreateToggle({
+CombatTab:CreateSection("Defense")
+CombatTab:CreateToggle({
     Name = "Enemy Hitboxes",
     CurrentValue = false,
     Callback = function(Value) end,
 })
 
-DefenseSection:CreateSlider({
+CombatTab:CreateSlider({
     Name = "Expand Enemy Hitboxes (Studs)",
     Range = {2, 20},
     Increment = 1,
@@ -331,7 +320,7 @@ DefenseSection:CreateSlider({
     Callback = function(Value) end,
 })
 
-DefenseSection:CreateToggle({
+CombatTab:CreateToggle({
     Name = "Auto Parry / Block",
     CurrentValue = false,
     Callback = function(Value) end,
