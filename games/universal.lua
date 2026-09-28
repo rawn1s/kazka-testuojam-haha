@@ -4,7 +4,7 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 
 -- ==========================================
--- 1. FORCE RED ACCENT NATIVELY IN THEME TABLE
+-- 1. FORCE RED ACCENT THEME OVERRIDES
 -- ==========================================
 local CrimsonRed = Color3.fromRGB(235, 50, 50)
 local DarkCrimson = Color3.fromRGB(180, 30, 30)
@@ -13,9 +13,7 @@ if Fluent.Themes then
     for themeName, themeTable in pairs(Fluent.Themes) do
         if type(themeTable) == "table" then
             themeTable.Accent = CrimsonRed
-            if themeTable.DarkAccent then
-                themeTable.DarkAccent = DarkCrimson
-            end
+            themeTable.DarkAccent = DarkCrimson
         end
     end
 end
@@ -46,7 +44,7 @@ local Tabs = {
 local Options = Fluent.Options
 
 -- ==========================================
--- HELPER: SIDE-BY-SIDE (2 COLUMN) LAYOUT
+-- HELPERS: 2-COLUMN LAYOUT & STACKED ELEMENTS
 -- ==========================================
 local function CreateTwoColumns(Tab)
     local ColumnHolder = Instance.new("Frame")
@@ -85,6 +83,47 @@ local function CreateTwoColumns(Tab)
     return LeftColumn, RightColumn
 end
 
+-- Function to stack element title on top and control box below
+local function StackElement(element)
+    if not element or not element.Frame then return element end
+    task.defer(function()
+        pcall(function()
+            local frame = element.Frame
+            frame.Size = UDim2.new(1, 0, 0, 62)
+            
+            -- Disable horizontal list layout if present
+            for _, child in ipairs(frame:GetChildren()) do
+                if child:IsA("UIListLayout") then
+                    child.Enabled = false
+                end
+            end
+            
+            local titleLabel = frame:FindFirstChildWhichIsA("TextLabel", true)
+            local controlBox = nil
+            
+            for _, child in ipairs(frame:GetChildren()) do
+                if (child:IsA("Frame") or child:IsA("TextButton") or child:IsA("ImageLabel")) and child ~= titleLabel then
+                    controlBox = child
+                    break
+                end
+            end
+            
+            if titleLabel then
+                titleLabel.Position = UDim2.new(0, 10, 0, 4)
+                titleLabel.Size = UDim2.new(1, -20, 0, 20)
+                titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+                titleLabel.TextTruncate = Enum.TextTruncate.None
+            end
+            
+            if controlBox then
+                controlBox.Position = UDim2.new(0, 10, 0, 28)
+                controlBox.Size = UDim2.new(1, -20, 0, 28)
+            end
+        end)
+    end)
+    return element
+end
+
 
 -- ==========================================
 -- -- INFORMATION TAB
@@ -101,65 +140,65 @@ Tabs.Information:AddParagraph({
 
 
 -- ==========================================
--- -- FARMING TAB (SIDE BY SIDE)
+-- -- FARMING TAB
 -- ==========================================
 local FarmLeft, FarmRight = CreateTwoColumns(Tabs.Farming)
 
 -- Left Column: Mobs & Quests
 Tabs.Farming.Container = FarmLeft
 local FarmingSection1 = Tabs.Farming:AddSection("Mobs / Bosses")
-FarmingSection1:AddDropdown("BossSelection", {
+StackElement(FarmingSection1:AddDropdown("BossSelection", {
     Title = "Boss / NPC Selection",
     Values = {"Bandit", "Mother Bear", "Boss Placeholder", "Alpha Wolf", "Bandit Leader", "Guard"},
     Multi = true,
     Default = {"Bandit"},
-})
+}))
 FarmingSection1:AddToggle("AutoHopBoss", { Title = "Auto Hop After Boss Kill", Default = false })
-FarmingSection1:AddInput("HopSettings1", {
+StackElement(FarmingSection1:AddInput("HopSettings1", {
     Title = "Auto Hop Settings (Players / Region)",
     Default = "Max Players: 5, Region: US",
     Placeholder = "Max Players: 5, Region: US",
     Numeric = false,
     Finished = true,
-})
+}))
 FarmingSection1:AddToggle("AutoCollectChest", { Title = "Auto Collect Chest", Default = false })
 
 local FarmingSection3 = Tabs.Farming:AddSection("Quests")
-FarmingSection3:AddDropdown("QuestSelection", {
+StackElement(FarmingSection3:AddDropdown("QuestSelection", {
     Title = "Quest Selection",
     Values = {"Quest 1: Bandit Sweep", "Quest 2: Boss Extermination"},
     Multi = false,
     Default = 1,
-})
+}))
 FarmingSection3:AddToggle("AutoHopQuest", { Title = "Auto Hop Servers After Timed Quest", Default = false })
 
 -- Right Column: Weapons & Items
 Tabs.Farming.Container = FarmRight
 local FarmingSection2 = Tabs.Farming:AddSection("Weapons / Items")
-FarmingSection2:AddDropdown("WeaponDrops", {
+StackElement(FarmingSection2:AddDropdown("WeaponDrops", {
     Title = "Auto Farm Weapon Drops (Priority)",
     Values = {"Best Available", "Katana", "Spear", "Dagger", "Halberd", "Greatsword"},
     Multi = true,
     Default = {"Best Available"},
-})
-FarmingSection2:AddDropdown("ItemDrops", {
+}))
+StackElement(FarmingSection2:AddDropdown("ItemDrops", {
     Title = "Auto Farm Item Drops (Priority)",
     Values = {"Scroll", "Pouch", "Gem", "Key", "Token", "Crystal"},
     Multi = true,
     Default = {"Scroll"},
-})
+}))
 FarmingSection2:AddToggle("AutoHopNoSpawn", { Title = "Auto Hop If Drop NPC Not Spawned", Default = false })
-FarmingSection2:AddInput("HopSettings2", {
+StackElement(FarmingSection2:AddInput("HopSettings2", {
     Title = "Auto Hop Settings (Players / Region)",
     Default = "Max Players: 5, Region: US",
     Placeholder = "Max Players: 5, Region: US",
     Numeric = false,
     Finished = true,
-})
+}))
 
 
 -- ==========================================
--- -- DUNGEON TAB (SIDE BY SIDE)
+-- -- DUNGEON TAB
 -- ==========================================
 local DungLeft, DungRight = CreateTwoColumns(Tabs.Dungeon)
 
@@ -167,32 +206,32 @@ local DungLeft, DungRight = CreateTwoColumns(Tabs.Dungeon)
 Tabs.Dungeon.Container = DungLeft
 local DungeonSection1 = Tabs.Dungeon:AddSection("Cards")
 DungeonSection1:AddToggle("AutoPickCard", { Title = "Auto Pick Card", Default = false })
-DungeonSection1:AddDropdown("CardsBlacklist", {
+StackElement(DungeonSection1:AddDropdown("CardsBlacklist", {
     Title = "What Cards NOT to Pick",
     Values = {"Card A", "Card B", "Card C", "Card D", "Card E"},
     Multi = true,
     Default = {},
-})
+}))
 
 -- Right Column: Priorities
 Tabs.Dungeon.Container = DungRight
 local DungeonSection2 = Tabs.Dungeon:AddSection("Priorities & Whitelist")
-DungeonSection2:AddDropdown("CardsWhitelist", {
+StackElement(DungeonSection2:AddDropdown("CardsWhitelist", {
     Title = "What Cards ALWAYS to Pick",
     Values = {"Card X", "Card Y", "Card Z"},
     Multi = true,
     Default = {},
-})
-DungeonSection2:AddDropdown("CardTypePriority", {
+}))
+StackElement(DungeonSection2:AddDropdown("CardTypePriority", {
     Title = "Card TYPE Priority",
     Values = {"Damage", "Defense", "Utility", "Speed"},
     Multi = true,
     Default = {"Damage"},
-})
+}))
 
 
 -- ==========================================
--- -- PLAYER TAB (SIDE BY SIDE)
+-- -- PLAYER TAB
 -- ==========================================
 local PlayLeft, PlayRight = CreateTwoColumns(Tabs.Player)
 
@@ -200,7 +239,7 @@ Tabs.Player.Container = PlayLeft
 local PlayerSection1 = Tabs.Player:AddSection("Movement Hacks")
 PlayerSection1:AddToggle("Noclip", { Title = "Noclip", Default = false })
 PlayerSection1:AddToggle("HighJumpToggle", { Title = "High Jump", Default = false })
-PlayerSection1:AddSlider("HighJumpHeight", {
+StackElement(PlayerSection1:AddSlider("HighJumpHeight", {
     Title = "High Jump Height (Studs)",
     Description = "Adjust jump velocity height",
     Default = 25,
@@ -208,30 +247,30 @@ PlayerSection1:AddSlider("HighJumpHeight", {
     Max = 100,
     Rounding = 0,
     Suffix = " studs"
-})
+}))
 
 Tabs.Player.Container = PlayRight
 local PlayerSection2 = Tabs.Player:AddSection("Attributes")
-PlayerSection2:AddSlider("UnlimitedFOV", {
+StackElement(PlayerSection2:AddSlider("UnlimitedFOV", {
     Title = "Unlimited FOV",
     Default = 90,
     Min = 70,
     Max = 120,
     Rounding = 0,
     Suffix = "°"
-})
-PlayerSection2:AddSlider("MovementSpeed", {
+}))
+StackElement(PlayerSection2:AddSlider("MovementSpeed", {
     Title = "Movement Speed",
     Default = 16,
     Min = 16,
     Max = 100,
     Rounding = 0,
     Suffix = " spd"
-})
+}))
 
 
 -- ==========================================
--- -- TRAINING TAB (SIDE BY SIDE)
+-- -- TRAINING TAB
 -- ==========================================
 local TrainLeft, TrainRight = CreateTwoColumns(Tabs.Training)
 
@@ -248,12 +287,12 @@ Tabs.Training.Container = TrainRight
 local TrainingSection2 = Tabs.Training:AddSection("Auto Skill Tree")
 TrainingSection2:AddParagraph({ Title = "Skill Points Balance", Content = "Current Unspent Skill Points: 0 SP" })
 TrainingSection2:AddToggle("AutoAllocateSP", { Title = "Auto Allocate Skill Points on Level Up", Default = false })
-TrainingSection2:AddDropdown("AllocationPriority", {
+StackElement(TrainingSection2:AddDropdown("AllocationPriority", {
     Title = "Allocation Priority",
     Values = {"Max Health Focus", "Damage Focus", "Stamina Focus", "Balanced"},
     Multi = false,
     Default = 4,
-})
+}))
 TrainingSection2:AddButton({
     Title = "Allocate All Available Skill Points Now",
     Callback = function() end
@@ -261,54 +300,54 @@ TrainingSection2:AddButton({
 
 
 -- ==========================================
--- -- COMBAT TAB (SIDE BY SIDE)
+-- -- COMBAT TAB
 -- ==========================================
 local CombLeft, CombRight = CreateTwoColumns(Tabs.Combat)
 
 Tabs.Combat.Container = CombLeft
 local CombatSection1 = Tabs.Combat:AddSection("Offense")
-CombatSection1:AddSlider("KillAuraRange", {
+StackElement(CombatSection1:AddSlider("KillAuraRange", {
     Title = "Kill Aura Range (Studs)",
     Default = 0,
     Min = 0,
     Max = 50,
     Rounding = 0,
     Suffix = " studs"
-})
+}))
 CombatSection1:AddToggle("AutoAttack", { Title = "Auto Attack", Default = false })
-CombatSection1:AddSlider("AASpeed", {
+StackElement(CombatSection1:AddSlider("AASpeed", {
     Title = "AA Speed",
     Default = 1,
     Min = 1,
     Max = 10,
     Rounding = 1,
     Suffix = "x"
-})
-CombatSection1:AddDropdown("EquipWeapon", {
+}))
+StackElement(CombatSection1:AddDropdown("EquipWeapon", {
     Title = "Equip Weapon",
     Values = {"Weapon 1", "Weapon 2"},
     Multi = false,
     Default = 1,
-})
-CombatSection1:AddDropdown("AutoSkills", {
+}))
+StackElement(CombatSection1:AddDropdown("AutoSkills", {
     Title = "Auto Skills",
     Values = {"Skill A", "Skill B", "Skill C"},
     Multi = true,
     Default = {},
-})
+}))
 CombatSection1:AddToggle("TPAllMobs", { Title = "TP All Mobs to Person", Default = false })
 
 Tabs.Combat.Container = CombRight
 local CombatSection2 = Tabs.Combat:AddSection("Defense")
 CombatSection2:AddToggle("EnemyHitboxes", { Title = "Enemy Hitboxes", Default = false })
-CombatSection2:AddSlider("ExpandHitboxes", {
+StackElement(CombatSection2:AddSlider("ExpandHitboxes", {
     Title = "Expand Enemy Hitboxes (Studs)",
     Default = 2,
     Min = 2,
     Max = 20,
     Rounding = 0,
     Suffix = " studs"
-})
+}))
 CombatSection2:AddToggle("AutoParry", { Title = "Auto Parry / Block", Default = false })
 
 
@@ -322,9 +361,40 @@ SaveManager:SetFolder("Sakka")
 SaveManager:SetFolder("Sakka/configs")
 SaveManager:BuildConfigSection(Tabs.Settings)
 
+
+-- ==========================================
+-- PERSISTENT RED ACCENT ENFORCER
+-- ==========================================
+task.spawn(function()
+    while task.wait(0.2) do
+        pcall(function()
+            local containers = {game:GetService("CoreGui")}
+            if gethui then table.insert(containers, gethui()) end
+            
+            for _, container in ipairs(containers) do
+                for _, descendant in ipairs(container:GetDescendants()) do
+                    if descendant:IsA("Frame") or descendant:IsA("TextButton") or descendant:IsA("ImageLabel") then
+                        local col = descendant.BackgroundColor3
+                        -- Recolor default Fluent blue frames, tab indicators, and toggles
+                        if (col.B > 0.55 and col.B > col.R + 0.15) or (col.R < 0.25 and col.G < 0.65 and col.B > 0.65) then
+                            descendant.BackgroundColor3 = CrimsonRed
+                        end
+                        if descendant:IsA("ImageLabel") then
+                            local imgCol = descendant.ImageColor3
+                            if imgCol.B > 0.55 and imgCol.B > imgCol.R + 0.15 then
+                                descendant.ImageColor3 = CrimsonRed
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
 Window:SelectTab(1)
 Fluent:Notify({
     Title = "Sakka",
-    Content = "Loaded with Red accents and 2-Column layout!",
+    Content = "Successfully loaded with persistent Red theme & stacked controls!",
     Duration = 5
 })
