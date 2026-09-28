@@ -4,37 +4,27 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 
 -- ==========================================
--- 1. FORCE NATIVE RED ACCENT (NO BLUE FLASH)
+-- 1. REGISTER NATIVE RED PRESET IN FLUENT
 -- ==========================================
 local CrimsonRed = Color3.fromRGB(235, 50, 50)
 local DarkCrimson = Color3.fromRGB(180, 30, 30)
 
-if Fluent.Themes then
-    for themeName, themeTable in pairs(Fluent.Themes) do
-        if type(themeTable) == "table" then
-            themeTable.Accent = CrimsonRed
-            themeTable.DarkAccent = DarkCrimson
-            themeTable.ActiveTab = CrimsonRed
-        end
-    end
+-- Duplicate default Dark theme settings and inject Red Accents
+local CrimsonTheme = {}
+for key, val in pairs(Fluent.Themes.Dark) do
+    CrimsonTheme[key] = val
 end
 
--- Override GetThemeProperty so all internal animation tweens target Red directly
-local rawGetThemeProperty = Fluent.GetThemeProperty
-Fluent.GetThemeProperty = function(self, property)
-    if property == "Accent" or property == "ActiveTab" then
-        return CrimsonRed
-    elseif property == "DarkAccent" then
-        return DarkCrimson
-    end
-    if rawGetThemeProperty then
-        return rawGetThemeProperty(self, property)
-    end
-    return CrimsonRed
-end
+CrimsonTheme.Accent = CrimsonRed
+CrimsonTheme.DarkAccent = DarkCrimson
+CrimsonTheme.ActiveTab = CrimsonRed
+
+-- Inject custom preset into Fluent's Theme dictionary
+Fluent.Themes.Crimson = CrimsonTheme
+
 
 -- ==========================================
--- 2. CREATE WINDOW & TABS
+-- 2. CREATE WINDOW USING THE CRIMSON THEME
 -- ==========================================
 local Window = Fluent:CreateWindow({
     Title = "Sakka",
@@ -42,7 +32,7 @@ local Window = Fluent:CreateWindow({
     TabWidth = 160,
     Size = UDim2.fromOffset(920, 600),
     Acrylic = true,
-    Theme = "Dark",
+    Theme = "Crimson", -- Fluent now natively drives all animations with Red!
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
@@ -58,8 +48,9 @@ local Tabs = {
 
 local Options = Fluent.Options
 
+
 -- ==========================================
--- HELPER: 2-COLUMN SECTION CONTAINER
+-- HELPER: 2-COLUMN SECTION LAYOUT
 -- ==========================================
 local function CreateTwoColumns(Tab)
     local ColumnHolder = Instance.new("Frame")
@@ -88,7 +79,7 @@ local function CreateTwoColumns(Tab)
     RightColumn.Position = UDim2.new(0.515, 0, 0, 0)
     RightColumn.AutomaticSize = Enum.AutomaticSize.Y
     RightColumn.BackgroundTransparency = 1
-    RightColumn.Parent = RightColumn and ColumnHolder
+    RightColumn.Parent = ColumnHolder
 
     local RightLayout = Instance.new("UIListLayout")
     RightLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -337,6 +328,6 @@ SaveManager:BuildConfigSection(Tabs.Settings)
 Window:SelectTab(1)
 Fluent:Notify({
     Title = "Sakka",
-    Content = "Loaded with native Crimson Red theme & 0 console errors!",
+    Content = "Loaded with native Crimson theme!",
     Duration = 5
 })
