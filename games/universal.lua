@@ -9,13 +9,12 @@ local Window = Fluent:CreateWindow({
     SubTitle = "by rawn1s",
     TabWidth = 160,
     Size = UDim2.fromOffset(880, 580),
-    Acrylic = true, -- Modern blurred background effect
+    Acrylic = true,
     Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Fluent doesn't have a direct permanent marker font built in, 
--- but we can set up our tabs cleanly.
+-- Define Tabs (Settings is placed below Combat)
 local Tabs = {
     Information = Window:AddTab({ Title = "Information", Icon = "info" }),
     Farming     = Window:AddTab({ Title = "Farming", Icon = "sword" }),
@@ -23,6 +22,7 @@ local Tabs = {
     Player      = Window:AddTab({ Title = "Player", Icon = "user" }),
     Training    = Window:AddTab({ Title = "Training", Icon = "dumbbell" }),
     Combat      = Window:AddTab({ Title = "Combat", Icon = "swords" }),
+    Settings    = Window:AddTab({ Title = "Settings", Icon = "settings" }),
 }
 
 local Options = Fluent.Options
@@ -256,19 +256,45 @@ CombatSection2:AddSlider("ExpandHitboxes", {
 CombatSection2:AddToggle("AutoParry", { Title = "Auto Parry / Block", Default = false })
 
 
--- Set up configuration saving & theme management
+-- ==========================================
+-- -- SETTINGS / CONFIG TAB
+-- ==========================================
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({})
 InterfaceManager:SetFolder("SakkaHub")
 SaveManager:SetFolder("SakkaHub/configs")
-SaveManager:BuildConfigSection(Tabs.Information)
-InterfaceManager:SetupWindow(Tabs.Information)
+SaveManager:BuildConfigSection(Tabs.Settings)
+InterfaceManager:SetupWindow(Tabs.Settings)
+
+
+-- ==========================================
+-- UI THEME & TITLE OVERRIDES
+-- ==========================================
+task.spawn(function()
+    task.wait(0.4)
+    local containers = {game:GetService("CoreGui")}
+    pcall(function() if gethui then table.insert(containers, gethui()) end end)
+    pcall(function() table.insert(containers, game:GetService("Players").LocalPlayer.PlayerGui) end)
+    
+    for _, container in ipairs(containers) do
+        pcall(function()
+            for _, descendant in ipairs(container:GetDescendants()) do
+                -- Custom title branding & color styling
+                if descendant:IsA("TextLabel") and (descendant.Text:find("Sakka Hub") or descendant.Text == "Sakka Hub") then
+                    descendant.Text = "Sakka"
+                    descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
+                    descendant.TextXAlignment = Enum.TextXAlignment.Left
+                end
+            end
+        end)
+    end
+end)
 
 Window:SelectTab(1)
 Fluent:Notify({
     Title = "Sakka Hub",
-    Content = "Fluent UI loaded successfully!",
+    Content = "Successfully loaded with red accents & custom settings!",
     Duration = 5
 })
