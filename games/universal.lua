@@ -2,7 +2,12 @@
 
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+-- Force Fluent accent to Red immediately
+if Fluent.Theme then
+    Fluent.Theme.Accent = Color3.fromRGB(235, 50, 50)
+    Fluent.Theme.DarkAccent = Color3.fromRGB(180, 30, 30)
+end
 
 local Window = Fluent:CreateWindow({
     Title = "Sakka",
@@ -13,14 +18,6 @@ local Window = Fluent:CreateWindow({
     Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
-
--- Set up Red Accent Theme natively
-pcall(function()
-    Fluent:ToggleTheme("Dark")
-    if Fluent.UseTheme then
-        Fluent:UseTheme("Dark")
-    end
-end)
 
 local Tabs = {
     Information = Window:AddTab({ Title = "Information", Icon = "info" }),
@@ -267,48 +264,15 @@ CombatSection2:AddToggle("AutoParry", { Title = "Auto Parry / Block", Default = 
 -- -- SETTINGS / CONFIG TAB
 -- ==========================================
 SaveManager:SetLibrary(Fluent)
-InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({})
-InterfaceManager:SetFolder("Sakka")
+SaveManager:SetFolder("Sakka")
 SaveManager:SetFolder("Sakka/configs")
 SaveManager:BuildConfigSection(Tabs.Settings)
-
--- Safely set up interface manager elements without throwing missing method errors
-pcall(function()
-    InterfaceManager:BuildInterfaceSection(Tabs.Settings)
-end)
-
-
--- ==========================================
--- LIGHTWEIGHT ACCENT OVERRIDE (RED ACCENTS & BARS)
--- ==========================================
-task.spawn(function()
-    task.wait(0.3)
-    local containers = {game:GetService("CoreGui")}
-    pcall(function() if gethui then table.insert(containers, gethui()) end end)
-    pcall(function() table.insert(containers, game:GetService("Players").LocalPlayer.PlayerGui) end)
-    
-    local redColor = Color3.fromRGB(235, 50, 50)
-
-    for _, container in ipairs(containers) do
-        pcall(function()
-            for _, descendant in ipairs(container:GetDescendants()) do
-                if descendant:IsA("Frame") or descendant:IsA("TextButton") or descendant:IsA("ImageLabel") then
-                    local col = descendant.BackgroundColor3
-                    -- Target Fluent's default blue UI indicators and toggle handles
-                    if (col.B > col.R and col.B > col.G and col.B > 0.3) or (col.G < 0.2 and col.R < 0.2 and col.B > 0.4) then
-                        descendant.BackgroundColor3 = redColor
-                    end
-                end
-            end
-        end)
-    end
-end)
 
 Window:SelectTab(1)
 Fluent:Notify({
     Title = "Sakka",
-    Content = "Loaded successfully with configurations & red theme!",
+    Content = "Successfully loaded with red accents & working config!",
     Duration = 5
 })
