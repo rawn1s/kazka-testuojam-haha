@@ -1,54 +1,25 @@
 -- games/universal.lua
 
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+-- Load Fluent Modded, SaveManager, and ThemeManager
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/disco0707/Fluent-Modded/main/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/disco0707/Fluent-Modded/main/Addons/SaveManager.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/disco0707/Fluent-Modded/main/Addons/ThemeManager.lua"))()
 
 -- ==========================================
--- 1. CREATE WINDOW FIRST
+-- 1. CREATE WINDOW
 -- ==========================================
 local Window = Fluent:CreateWindow({
     Title = "Sakka",
     SubTitle = "by rawn1s",
     TabWidth = 160,
-    Size = UDim2.fromOffset(920, 600),
+    Size = UDim2.fromOffset(900, 580),
     Acrylic = true,
     Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
 -- ==========================================
--- 2. SAFE CRIMSON RED ACCENT OVERRIDE
--- ==========================================
-local CrimsonRed = Color3.fromRGB(235, 50, 50)
-local DarkCrimson = Color3.fromRGB(180, 30, 30)
-
--- Intercept theme property calls so all toggle/tab tweens target Crimson Red natively
-local rawGetThemeProperty = Fluent.GetThemeProperty
-Fluent.GetThemeProperty = function(self, property)
-    if property == "Accent" or property == "ActiveTab" or property == "Focus" then
-        return CrimsonRed
-    elseif property == "DarkAccent" then
-        return DarkCrimson
-    end
-    if rawGetThemeProperty then
-        return rawGetThemeProperty(self, property)
-    end
-    return CrimsonRed
-end
-
--- Safely mutate loaded theme dictionaries
-if type(Fluent.Themes) == "table" then
-    for themeName, themeTable in pairs(Fluent.Themes) do
-        if type(themeTable) == "table" then
-            themeTable.Accent = CrimsonRed
-            themeTable.DarkAccent = DarkCrimson
-            themeTable.ActiveTab = CrimsonRed
-        end
-    end
-end
-
--- ==========================================
--- 3. CREATE TABS
+-- 2. CREATE TABS
 -- ==========================================
 local Tabs = {
     Information = Window:AddTab({ Title = "Information", Icon = "info" }),
@@ -62,54 +33,28 @@ local Tabs = {
 
 local Options = Fluent.Options
 
-
 -- ==========================================
--- HELPER: 2-COLUMN SECTION CONTAINER
+-- 3. NATIVE RED ACCENT THEME SETUP
 -- ==========================================
-local function CreateTwoColumns(Tab)
-    local ColumnHolder = Instance.new("Frame")
-    ColumnHolder.Name = "ColumnHolder"
-    ColumnHolder.Size = UDim2.new(1, 0, 0, 0)
-    ColumnHolder.AutomaticSize = Enum.AutomaticSize.Y
-    ColumnHolder.BackgroundTransparency = 1
-    ColumnHolder.Parent = Tab.Container
+ThemeManager:SetLibrary(Fluent)
+SaveManager:SetLibrary(Fluent)
 
-    local LeftColumn = Instance.new("Frame")
-    LeftColumn.Name = "LeftColumn"
-    LeftColumn.Size = UDim2.new(0.485, 0, 0, 0)
-    LeftColumn.Position = UDim2.new(0, 0, 0, 0)
-    LeftColumn.AutomaticSize = Enum.AutomaticSize.Y
-    LeftColumn.BackgroundTransparency = 1
-    LeftColumn.Parent = ColumnHolder
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
 
-    local LeftLayout = Instance.new("UIListLayout")
-    LeftLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    LeftLayout.Padding = UDim.new(0, 10)
-    LeftLayout.Parent = LeftColumn
+SaveManager:SetFolder("Sakka")
+SaveManager:SetFolder("Sakka/configs")
+ThemeManager:SetFolder("Sakka/themes")
 
-    local RightColumn = Instance.new("Frame")
-    RightColumn.Name = "RightColumn"
-    RightColumn.Size = UDim2.new(0.485, 0, 0, 0)
-    RightColumn.Position = UDim2.new(0.515, 0, 0, 0)
-    RightColumn.AutomaticSize = Enum.AutomaticSize.Y
-    RightColumn.BackgroundTransparency = 1
-    RightColumn.Parent = ColumnHolder
-
-    local RightLayout = Instance.new("UIListLayout")
-    RightLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    RightLayout.Padding = UDim.new(0, 10)
-    RightLayout.Parent = RightColumn
-
-    return LeftColumn, RightColumn
-end
-
-local function AddSectionToColumn(Tab, column, title)
-    local section = Tab:AddSection(title)
-    local sectionFrame = section.Frame or (section.Container and section.Container.Parent)
-    if sectionFrame then
-        sectionFrame.Parent = column
-    end
-    return section
+-- Apply native Crimson Red accent color
+if Fluent.SetAccentColor then
+    Fluent:SetAccentColor(Color3.fromRGB(235, 50, 50))
+elseif ThemeManager.SetSystemTheme then
+    ThemeManager:CustomTheme("CrimsonRed", {
+        Accent = Color3.fromRGB(235, 50, 50),
+        DarkAccent = Color3.fromRGB(180, 30, 30),
+        ActiveTab = Color3.fromRGB(235, 50, 50)
+    })
 end
 
 
@@ -130,10 +75,7 @@ Tabs.Information:AddParagraph({
 -- ==========================================
 -- -- FARMING TAB
 -- ==========================================
-local FarmLeft, FarmRight = CreateTwoColumns(Tabs.Farming)
-
--- Left Column
-local FarmingSection1 = AddSectionToColumn(Tabs.Farming, FarmLeft, "Mobs / Bosses")
+local FarmingSection1 = Tabs.Farming:AddSection("Mobs / Bosses")
 FarmingSection1:AddDropdown("BossSelection", {
     Title = "Boss / NPC Selection",
     Values = {"Bandit", "Mother Bear", "Boss Placeholder", "Alpha Wolf", "Bandit Leader", "Guard"},
@@ -143,6 +85,7 @@ FarmingSection1:AddDropdown("BossSelection", {
 FarmingSection1:AddToggle("AutoHopBoss", { Title = "Auto Hop After Boss Kill", Default = false })
 FarmingSection1:AddInput("HopSettings1", {
     Title = "Auto Hop Settings",
+    Description = "Players / Region format",
     Default = "Max Players: 5, Region: US",
     Placeholder = "Max Players: 5, Region: US",
     Numeric = false,
@@ -150,17 +93,7 @@ FarmingSection1:AddInput("HopSettings1", {
 })
 FarmingSection1:AddToggle("AutoCollectChest", { Title = "Auto Collect Chest", Default = false })
 
-local FarmingSection3 = AddSectionToColumn(Tabs.Farming, FarmLeft, "Quests")
-FarmingSection3:AddDropdown("QuestSelection", {
-    Title = "Quest Selection",
-    Values = {"Quest 1: Bandit Sweep", "Quest 2: Boss Extermination"},
-    Multi = false,
-    Default = 1,
-})
-FarmingSection3:AddToggle("AutoHopQuest", { Title = "Auto Hop After Quest", Default = false })
-
--- Right Column
-local FarmingSection2 = AddSectionToColumn(Tabs.Farming, FarmRight, "Weapons / Items")
+local FarmingSection2 = Tabs.Farming:AddSection("Weapons & Items")
 FarmingSection2:AddDropdown("WeaponDrops", {
     Title = "Weapon Drops Priority",
     Values = {"Best Available", "Katana", "Spear", "Dagger", "Halberd", "Greatsword"},
@@ -173,7 +106,7 @@ FarmingSection2:AddDropdown("ItemDrops", {
     Multi = true,
     Default = {"Scroll"},
 })
-FarmingSection2:AddToggle("AutoHopNoSpawn", { Title = "Auto Hop (NPC Unspawned)", Default = false })
+FarmingSection2:AddToggle("AutoHopNoSpawn", { Title = "Auto Hop If NPC Not Spawned", Default = false })
 FarmingSection2:AddInput("HopSettings2", {
     Title = "Auto Hop Settings",
     Default = "Max Players: 5, Region: US",
@@ -182,26 +115,33 @@ FarmingSection2:AddInput("HopSettings2", {
     Finished = true,
 })
 
+local FarmingSection3 = Tabs.Farming:AddSection("Quests")
+FarmingSection3:AddDropdown("QuestSelection", {
+    Title = "Quest Selection",
+    Values = {"Quest 1: Bandit Sweep", "Quest 2: Boss Extermination"},
+    Multi = false,
+    Default = 1,
+})
+FarmingSection3:AddToggle("AutoHopQuest", { Title = "Auto Hop After Timed Quest", Default = false })
+
 
 -- ==========================================
 -- -- DUNGEON TAB
 -- ==========================================
-local DungLeft, DungRight = CreateTwoColumns(Tabs.Dungeon)
-
--- Left Column
-local DungeonSection1 = AddSectionToColumn(Tabs.Dungeon, DungLeft, "Cards")
+local DungeonSection1 = Tabs.Dungeon:AddSection("Cards")
 DungeonSection1:AddToggle("AutoPickCard", { Title = "Auto Pick Card", Default = false })
 DungeonSection1:AddDropdown("CardsBlacklist", {
     Title = "Card Blacklist",
+    Description = "Cards NOT to pick",
     Values = {"Card A", "Card B", "Card C", "Card D", "Card E"},
     Multi = true,
     Default = {},
 })
 
--- Right Column
-local DungeonSection2 = AddSectionToColumn(Tabs.Dungeon, DungRight, "Priorities & Whitelist")
+local DungeonSection2 = Tabs.Dungeon:AddSection("Priorities & Whitelist")
 DungeonSection2:AddDropdown("CardsWhitelist", {
     Title = "Card Whitelist",
+    Description = "Cards ALWAYS to pick",
     Values = {"Card X", "Card Y", "Card Z"},
     Multi = true,
     Default = {},
@@ -217,14 +157,12 @@ DungeonSection2:AddDropdown("CardTypePriority", {
 -- ==========================================
 -- -- PLAYER TAB
 -- ==========================================
-local PlayLeft, PlayRight = CreateTwoColumns(Tabs.Player)
-
-local PlayerSection1 = AddSectionToColumn(Tabs.Player, PlayLeft, "Movement Hacks")
+local PlayerSection1 = Tabs.Player:AddSection("Movement")
 PlayerSection1:AddToggle("Noclip", { Title = "Noclip", Default = false })
 PlayerSection1:AddToggle("HighJumpToggle", { Title = "High Jump", Default = false })
 PlayerSection1:AddSlider("HighJumpHeight", {
     Title = "High Jump Height",
-    Description = "Adjust jump velocity height",
+    Description = "Adjust jump velocity",
     Default = 25,
     Min = 10,
     Max = 100,
@@ -232,7 +170,7 @@ PlayerSection1:AddSlider("HighJumpHeight", {
     Suffix = " studs"
 })
 
-local PlayerSection2 = AddSectionToColumn(Tabs.Player, PlayRight, "Attributes")
+local PlayerSection2 = Tabs.Player:AddSection("Attributes")
 PlayerSection2:AddSlider("UnlimitedFOV", {
     Title = "Unlimited FOV",
     Default = 90,
@@ -254,9 +192,7 @@ PlayerSection2:AddSlider("MovementSpeed", {
 -- ==========================================
 -- -- TRAINING TAB
 -- ==========================================
-local TrainLeft, TrainRight = CreateTwoColumns(Tabs.Training)
-
-local TrainingSection1 = AddSectionToColumn(Tabs.Training, TrainLeft, "Dojo Drills")
+local TrainingSection1 = Tabs.Training:AddSection("Dojo Drills")
 TrainingSection1:AddToggle("AutoPushUps", { Title = "Auto Push Ups", Default = false })
 TrainingSection1:AddToggle("AutoMeditation", { Title = "Auto Meditation", Default = false })
 TrainingSection1:AddToggle("AutoSquats", { Title = "Auto Squats", Default = false })
@@ -264,7 +200,7 @@ TrainingSection1:AddToggle("AutoBoulderSplit", { Title = "Auto Boulder Split", D
 TrainingSection1:AddToggle("AutoBoulderPush", { Title = "Auto Boulder Push", Default = false })
 TrainingSection1:AddToggle("InstantTraining", { Title = "Instant Training Complete", Default = false })
 
-local TrainingSection2 = AddSectionToColumn(Tabs.Training, TrainRight, "Auto Skill Tree")
+local TrainingSection2 = Tabs.Training:AddSection("Auto Skill Tree")
 TrainingSection2:AddParagraph({ Title = "Skill Points Balance", Content = "Current Unspent Skill Points: 0 SP" })
 TrainingSection2:AddToggle("AutoAllocateSP", { Title = "Auto Allocate Skill Points", Default = false })
 TrainingSection2:AddDropdown("AllocationPriority", {
@@ -282,9 +218,7 @@ TrainingSection2:AddButton({
 -- ==========================================
 -- -- COMBAT TAB
 -- ==========================================
-local CombLeft, CombRight = CreateTwoColumns(Tabs.Combat)
-
-local CombatSection1 = AddSectionToColumn(Tabs.Combat, CombLeft, "Offense")
+local CombatSection1 = Tabs.Combat:AddSection("Offense")
 CombatSection1:AddSlider("KillAuraRange", {
     Title = "Kill Aura Range",
     Default = 0,
@@ -316,7 +250,7 @@ CombatSection1:AddDropdown("AutoSkills", {
 })
 CombatSection1:AddToggle("TPAllMobs", { Title = "TP All Mobs to Person", Default = false })
 
-local CombatSection2 = AddSectionToColumn(Tabs.Combat, CombRight, "Defense")
+local CombatSection2 = Tabs.Combat:AddSection("Defense")
 CombatSection2:AddToggle("EnemyHitboxes", { Title = "Enemy Hitboxes", Default = false })
 CombatSection2:AddSlider("ExpandHitboxes", {
     Title = "Expand Enemy Hitboxes",
@@ -330,18 +264,14 @@ CombatSection2:AddToggle("AutoParry", { Title = "Auto Parry / Block", Default = 
 
 
 -- ==========================================
--- -- SETTINGS / CONFIG TAB
+-- -- SETTINGS TAB
 -- ==========================================
-SaveManager:SetLibrary(Fluent)
-SaveManager:IgnoreThemeSettings()
-SaveManager:SetIgnoreIndexes({})
-SaveManager:SetFolder("Sakka")
-SaveManager:SetFolder("Sakka/configs")
 SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:BuildThemeSection(Tabs.Settings)
 
 Window:SelectTab(1)
 Fluent:Notify({
     Title = "Sakka",
-    Content = "Loaded cleanly with Crimson Red theme!",
+    Content = "Loaded with Fluent Modded & Red Theme!",
     Duration = 5
 })
