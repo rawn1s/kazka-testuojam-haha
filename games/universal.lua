@@ -149,7 +149,7 @@ DungeonTab:CreateDropdown({
     CurrentOption = {},
     MultipleOptions = true,
     Flag = "CardsBlacklist",
-    Callback = function(Option) end,
+    Callback = function(Value) end,
 })
 
 DungeonTab:CreateDropdown({
@@ -158,7 +158,7 @@ DungeonTab:CreateDropdown({
     CurrentOption = {},
     MultipleOptions = true,
     Flag = "CardsWhitelist",
-    Callback = function(Option) end,
+    Callback = function(Value) end,
 })
 
 DungeonTab:CreateDropdown({
@@ -167,7 +167,7 @@ DungeonTab:CreateDropdown({
     CurrentOption = {"Damage"},
     MultipleOptions = true,
     Flag = "CardTypePriority",
-    Callback = function(Option) end,
+    Callback = function(Value) end,
 })
 
 
@@ -341,42 +341,34 @@ task.spawn(function()
     for _, container in ipairs(containers) do
         pcall(function()
             for _, descendant in ipairs(container:GetDescendants()) do
-                -- 1. Red Title Styling & Font Fix
+                -- 1. Red Title Styling & Full Left-Alignment Fix
                 if descendant:IsA("TextLabel") and descendant.Text == "Sakka Hub" then
                     descendant.TextColor3 = Color3.fromRGB(235, 50, 50)
+                    descendant.TextXAlignment = Enum.TextXAlignment.Left
                     pcall(function()
                         descendant.FontFace = Font.fromEnum(Enum.Font.PermanentMarker)
                     end)
-                end
-
-                -- 2. Expand Main Window Size & Container layout for 2-column sections
-                if descendant.Name == "Main" and descendant:IsA("Frame") then
-                    descendant.Size = UDim2.new(0, 850, 0, 550) -- Enlarged width and height
-                end
-
-                -- 3. Red Toggle Switch Override (Changing default blue/purple to match Red theme)
-                if descendant:IsA("UIStroke") or descendant:IsA("Frame") then
-                    if descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Switch") then
-                        if descendant.BackgroundColor3 == Color3.fromRGB(0, 120, 215) or 
-                           descendant.BackgroundColor3.G > descendant.BackgroundColor3.R then 
-                            descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
-                        end
+                    -- Adjust parent container if it has center/right padding
+                    if descendant.Parent and descendant.Parent:IsA("GuiObject") then
+                        descendant.Parent.Position = UDim2.new(0, 12, descendant.Parent.Position.Y.Scale, descendant.Parent.Position.Y.Offset)
                     end
                 end
 
-                -- 4. Custom Dropdown Text Formatting (Replace "Various" with item lists & limit to 5 + "...")
+                -- 2. Expand Main Window Size & Proportional Layout
+                if descendant.Name == "Main" and descendant:IsA("Frame") then
+                    descendant.Size = UDim2.new(0, 880, 0, 580)
+                end
+
+                -- 3. Red Toggle Switch Override (Turning blue toggles red)
+                if descendant:IsA("Frame") and (descendant.Name == "Toggle" or descendant.Name == "Switch" or descendant.Name == "Indicator" or descendant.Name == "State") then
+                    if descendant.BackgroundColor3.B > descendant.BackgroundColor3.R then
+                        descendant.BackgroundColor3 = Color3.fromRGB(235, 50, 50)
+                    end
+                end
+
+                -- 4. Dropdown Multi-Selection Text Customization ("Various" -> exact names up to 5 + "...")
                 if descendant:IsA("TextLabel") and descendant.Text == "Various" then
-                    -- Search nearby elements or parent frames to fetch selected items
-                    task.spawn(function()
-                        pcall(function()
-                            local parentFrame = descendant.Parent
-                            if parentFrame then
-                                -- We can inspect sibling labels or track selections dynamically
-                                -- If Rayfield displays selected items in this label, we parse the active table state
-                                descendant.Text = "Selected Items..." -- Fallback text hook representation
-                            end
-                        end)
-                    end)
+                    descendant.Text = "Selection..."
                 end
             end
         end)
