@@ -1,3 +1,7 @@
+--=============================================================
+--  Sakka Hub  --  universal.lua
+--  Loaded by loader.lua; runs in the executor.
+--=============================================================
 
 local SakkaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/rawn1s/SakkaUI-library/refs/heads/main/SakkaUI.lua"))()
 
@@ -16,7 +20,7 @@ local function placeholder(name)
 	end
 end
 
--- Shown above any dropdown whose order matters.
+-- Shown BELOW any dropdown whose order matters.
 local ORDER_NOTE = "Select in order: first = most important, last = least important"
 
 local function executorName()
@@ -51,11 +55,9 @@ local window = lib:CreateWindow({
 })
 
 window:LoadLocalAvatar()
--- Card fields are fixed: Client / KeyType / TimeLeft / Executions.
--- executor -> Client, key tier -> KeyType, device -> TimeLeft, run count -> Executions.
 window:SetCharacterInfo({
 	Client = executorName(),
-	KeyType = "Free",       -- flip to "Paid" once you add a key check
+	KeyType = "Free",
 	TimeLeft = deviceName(),
 	Executions = execCount,
 })
@@ -86,7 +88,6 @@ farmTab:AddToggle({
 	Default = false,
 	Callback = placeholder("Auto Farm Bosses"),
 })
-farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Boss Selection",
 	Options = {
@@ -99,18 +100,19 @@ farmTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Boss Selection"),
 })
+farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddToggle({
 	Text = "Auto Farm Caches",
 	Default = false,
 	Callback = placeholder("Auto Farm Caches"),
 })
-farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Cache Selection",
 	Options = { "T1", "T2", "T3" },
 	Default = {},
 	Callback = placeholder("Cache Selection"),
 })
+farmTab:AddDisclaimer(ORDER_NOTE)
 local autoChest = farmTab:AddToggle({
 	Text = "Auto Collect Chest",
 	Default = false,
@@ -129,7 +131,6 @@ farmTab:AddToggle({
 	Default = false,
 	Callback = placeholder("Auto Farm Weapons"),
 })
-farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Auto Farm Weapon Drops",
 	Options = {
@@ -141,9 +142,9 @@ farmTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Auto Farm Weapon Drops"),
 })
+farmTab:AddDisclaimer(ORDER_NOTE)
 
 farmTab:AddSection("Quests")
-farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Quest Selection",
 	Options = {
@@ -168,6 +169,7 @@ farmTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Quest Selection"),
 })
+farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddToggle({
 	Text = "Auto Quest",
 	Default = false,
@@ -193,8 +195,8 @@ farmTab:AddToggle({
 
 farmTab:AddSection("Breathing Style / BDA")
 -- NOTE: the dropdowns here are ALWAYS visible (no DependsOn) by design.
--- The CALLBACK is what checks whether the player is a slayer/demon and whether
--- an option is selected, and warns the user otherwise.
+-- The CALLBACK checks whether the player is a slayer/demon and whether an
+-- option is selected, and warns the user otherwise.
 farmTab:AddToggle({
 	Text = "Auto Breathing Style",
 	Default = false,
@@ -242,7 +244,6 @@ farmTab:AddDropdown({
 })
 
 farmTab:AddSection("Execution Priority")
-farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Section Priority",
 	Options = {
@@ -252,6 +253,7 @@ farmTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Section Priority"),
 })
+farmTab:AddDisclaimer(ORDER_NOTE)
 
 --=============================================================
 --  DUNGEON / ROGUELIKE
@@ -264,7 +266,6 @@ dungeonTab:AddToggle({
 	Default = false,
 	Callback = placeholder("Auto Pick Card"),
 })
-dungeonTab:AddDisclaimer(ORDER_NOTE)
 dungeonTab:AddMultiDropdown({
 	Title = "Cards Not To Pick",
 	Options = { "-- add card options here --" },
@@ -288,6 +289,7 @@ dungeonTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Stat Card Priority"),
 })
+dungeonTab:AddDisclaimer(ORDER_NOTE)
 
 dungeonTab:AddSection("Action")
 dungeonTab:AddToggle({
@@ -307,8 +309,6 @@ dungeonTab:AddTextInput({
 })
 
 dungeonTab:AddSection("Loot")
--- Reusable pattern: a toggle plus a "how many times" input that only appears
--- while the toggle is on.
 local function exchangePair(title, label)
 	local t = dungeonTab:AddToggle({
 		Text = title,
@@ -444,7 +444,6 @@ local autoSkill = trainTab:AddToggle({
 	Default = false,
 	Callback = placeholder("Auto Allocate Skill Points On Level Up"),
 })
-trainTab:AddDisclaimer(ORDER_NOTE)
 trainTab:AddMultiDropdown({
 	Title = "Allocation Priority",
 	Options = {
@@ -457,6 +456,7 @@ trainTab:AddMultiDropdown({
 	DependsOn = autoSkill,
 	Callback = placeholder("Allocation Priority"),
 })
+trainTab:AddDisclaimer(ORDER_NOTE)
 trainTab:AddButton({
 	Text = "Allocate All Available Skill Points",
 	Callback = placeholder("Allocate All Skill Points"),
@@ -485,8 +485,6 @@ combatTab:AddSlider({
 	Callback = placeholder("AA Speed"),
 })
 
--- Equip Weapon: built empty, then populated at runtime from the player's
--- Backpack + Character tools (object:Refresh replaces the option list live).
 local equipWeapon = combatTab:AddDropdown({
 	Text = "Equip Weapon",
 	Options = { "(loading...)" },
@@ -494,8 +492,6 @@ local equipWeapon = combatTab:AddDropdown({
 	Callback = placeholder("Equip Weapon"),
 })
 task.spawn(function()
-	-- TODO: if the game keeps weapons in a hotbar GUI instead of Tools, swap the
-	-- source below for whatever that is.
 	local list = {}
 	for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
 		if item:IsA("Tool") then table.insert(list, item.Name) end
@@ -512,13 +508,13 @@ task.spawn(function()
 	end
 end)
 
-combatTab:AddDisclaimer(ORDER_NOTE)
 combatTab:AddMultiDropdown({
 	Title = "Auto Skills",
 	Options = { "-- add skill names here --" },
 	Default = {},
 	Callback = placeholder("Auto Skills"),
 })
+combatTab:AddDisclaimer(ORDER_NOTE)
 local tpMobs = combatTab:AddToggle({
 	Text = "TP All Mobs To Person",
 	Default = false,
