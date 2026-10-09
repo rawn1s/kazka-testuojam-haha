@@ -30,7 +30,10 @@ return function(lib, window)
 		if hum and hum.Health <= 0 then return end
 
 		local ok, err = pcall(function()
-			firesignal(ClientEffects.Event, "Combat_Swings", char, combo, false)
+			-- ClientEffects is a BindableEvent; firing it directly replays the
+			-- same client-side swing the game triggers. Works without executor
+			-- functions like firesignal (which Xeno doesn't provide).
+			ClientEffects:Fire("Combat_Swings", char, combo, false)
 		end)
 		if not ok then
 			if aaConn then aaConn:Disconnect() aaConn = nil end
