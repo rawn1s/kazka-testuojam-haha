@@ -1,10 +1,11 @@
 
 local SakkaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/rawn1s/SakkaUI-library/refs/heads/main/SakkaUI.lua"))()
 
-local Players            = game:GetService("Players")
-local RunService         = game:GetService("RunService")
-local UserInputService   = game:GetService("UserInputService")
-local LocalPlayer        = Players.LocalPlayer
+--== services ==--
+local Players          = game:GetService("Players")
+local RunService       = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer      = Players.LocalPlayer
 
 local lib = SakkaUI.new()
 
@@ -14,6 +15,8 @@ local function placeholder(name)
 		lib:Notify({ Title = "Not Implemented", Content = name .. " has no game logic yet.", Duration = 3 })
 	end
 end
+
+-- Shown above any dropdown whose order matters.
 local ORDER_NOTE = "Select in order: first = most important, last = least important"
 
 local function executorName()
@@ -49,7 +52,7 @@ local window = lib:CreateWindow({
 
 window:LoadLocalAvatar()
 -- Card fields are fixed: Client / KeyType / TimeLeft / Executions.
--- We map executor -> Client, key tier -> KeyType, device -> TimeLeft, run count -> Executions.
+-- executor -> Client, key tier -> KeyType, device -> TimeLeft, run count -> Executions.
 window:SetCharacterInfo({
 	Client = executorName(),
 	KeyType = "Free",       -- flip to "Paid" once you add a key check
@@ -83,7 +86,7 @@ farmTab:AddToggle({
 	Default = false,
 	Callback = placeholder("Auto Farm Bosses"),
 })
-farmTab:AddLabel(ORDER_NOTE)
+farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Boss Selection",
 	Options = {
@@ -101,7 +104,7 @@ farmTab:AddToggle({
 	Default = false,
 	Callback = placeholder("Auto Farm Caches"),
 })
-farmTab:AddLabel(ORDER_NOTE)
+farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Cache Selection",
 	Options = { "T1", "T2", "T3" },
@@ -126,7 +129,7 @@ farmTab:AddToggle({
 	Default = false,
 	Callback = placeholder("Auto Farm Weapons"),
 })
-farmTab:AddLabel(ORDER_NOTE)
+farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Auto Farm Weapon Drops",
 	Options = {
@@ -140,7 +143,7 @@ farmTab:AddMultiDropdown({
 })
 
 farmTab:AddSection("Quests")
-farmTab:AddLabel(ORDER_NOTE)
+farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Quest Selection",
 	Options = {
@@ -189,9 +192,9 @@ farmTab:AddToggle({
 })
 
 farmTab:AddSection("Breathing Style / BDA")
--- NOTE: the two dropdowns here are ALWAYS visible (no DependsOn on purpose);
--- the CALLBACK is what checks whether the player is actually a slayer/demon
--- and whether an option has been chosen, and warns the user otherwise.
+-- NOTE: the dropdowns here are ALWAYS visible (no DependsOn) by design.
+-- The CALLBACK is what checks whether the player is a slayer/demon and whether
+-- an option is selected, and warns the user otherwise.
 farmTab:AddToggle({
 	Text = "Auto Breathing Style",
 	Default = false,
@@ -239,7 +242,7 @@ farmTab:AddDropdown({
 })
 
 farmTab:AddSection("Execution Priority")
-farmTab:AddLabel(ORDER_NOTE)
+farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddMultiDropdown({
 	Title = "Section Priority",
 	Options = {
@@ -261,21 +264,21 @@ dungeonTab:AddToggle({
 	Default = false,
 	Callback = placeholder("Auto Pick Card"),
 })
-dungeonTab:AddLabel(ORDER_NOTE)
+dungeonTab:AddDisclaimer(ORDER_NOTE)
 dungeonTab:AddMultiDropdown({
 	Title = "Cards Not To Pick",
 	Options = { "-- add card options here --" },
 	Default = {},
 	Callback = placeholder("Cards Not To Pick"),
 })
-dungeonTab:AddLabel(ORDER_NOTE)
+dungeonTab:AddDisclaimer(ORDER_NOTE)
 dungeonTab:AddMultiDropdown({
 	Title = "Cards Always To Pick",
 	Options = { "-- add card options here --" },
 	Default = {},
 	Callback = placeholder("Cards Always To Pick"),
 })
-dungeonTab:AddLabel(ORDER_NOTE)
+dungeonTab:AddDisclaimer(ORDER_NOTE)
 dungeonTab:AddMultiDropdown({
 	Title = "Stat Card Priority",
 	Options = {
@@ -304,13 +307,8 @@ dungeonTab:AddTextInput({
 })
 
 dungeonTab:AddSection("Loot")
-local openChest = dungeonTab:AddToggle({
-	Text = "Auto Open Dungeon Chest",
-	Default = false,
-	Callback = placeholder("Auto Open Dungeon Chest"),
-})
--- Reusable pattern: toggle + a "how many times" input that only shows when the
--- toggle is on.
+-- Reusable pattern: a toggle plus a "how many times" input that only appears
+-- while the toggle is on.
 local function exchangePair(title, label)
 	local t = dungeonTab:AddToggle({
 		Text = title,
@@ -326,6 +324,7 @@ local function exchangePair(title, label)
 	return t
 end
 
+exchangePair("Auto Open Dungeon Chest", "Open Chest")
 exchangePair("Auto Exchange Wen", "Wen")
 exchangePair("Auto Exchange Mythic Ore", "Mythic Ore")
 exchangePair("Auto Exchange Refinement Ore", "Refinement Ore")
@@ -367,7 +366,7 @@ local function applyNoclip()
 	end
 end
 
-local function refresh()
+local function refreshMovement()
 	local hum = getHumanoid()
 	if hum then hum.WalkSpeed = pstate.speed end
 	applyJump()
@@ -388,7 +387,7 @@ end
 
 LocalPlayer.CharacterAdded:Connect(function()
 	task.wait(1)
-	refresh()
+	refreshMovement()
 end)
 
 playerTab:AddSection("Movement")
@@ -431,12 +430,12 @@ playerTab:AddSlider({
 local trainTab = window:CreateTab("Training")
 
 trainTab:AddSection("Dojo Drills")
-trainTab:AddToggle({ Text = "Auto Push Ups",           Default = false, Callback = placeholder("Auto Push Ups") })
-trainTab:AddToggle({ Text = "Auto Meditation",         Default = false, Callback = placeholder("Auto Meditation") })
-trainTab:AddToggle({ Text = "Auto Squats",             Default = false, Callback = placeholder("Auto Squats") })
-trainTab:AddToggle({ Text = "Auto Boulder Split",      Default = false, Callback = placeholder("Auto Boulder Split") })
-trainTab:AddToggle({ Text = "Auto Boulder Push",       Default = false, Callback = placeholder("Auto Boulder Push") })
-trainTab:AddToggle({ Text = "Instant Training Complete", Default = false, Callback = placeholder("Instant Training Complete") })
+trainTab:AddToggle({ Text = "Auto Push Ups",            Default = false, Callback = placeholder("Auto Push Ups") })
+trainTab:AddToggle({ Text = "Auto Meditation",          Default = false, Callback = placeholder("Auto Meditation") })
+trainTab:AddToggle({ Text = "Auto Squats",              Default = false, Callback = placeholder("Auto Squats") })
+trainTab:AddToggle({ Text = "Auto Boulder Split",       Default = false, Callback = placeholder("Auto Boulder Split") })
+trainTab:AddToggle({ Text = "Auto Boulder Push",        Default = false, Callback = placeholder("Auto Boulder Push") })
+trainTab:AddToggle({ Text = "Instant Training Complete",Default = false, Callback = placeholder("Instant Training Complete") })
 
 trainTab:AddSection("Auto Skill Tree")
 trainTab:AddLabel("Skill Points Balance: 0")  -- update from a polling loop reading the game's stat
@@ -445,7 +444,7 @@ local autoSkill = trainTab:AddToggle({
 	Default = false,
 	Callback = placeholder("Auto Allocate Skill Points On Level Up"),
 })
-trainTab:AddLabel(ORDER_NOTE)
+trainTab:AddDisclaimer(ORDER_NOTE)
 trainTab:AddMultiDropdown({
 	Title = "Allocation Priority",
 	Options = {
@@ -486,9 +485,8 @@ combatTab:AddSlider({
 	Callback = placeholder("AA Speed"),
 })
 
--- Equip Weapon: we build the dropdown empty and populate it from the player's
--- inventory at runtime (the library's object:Refresh(list) replaces the option
--- list on the fly).  Fill loadWeapons() with your real inventory source.
+-- Equip Weapon: built empty, then populated at runtime from the player's
+-- Backpack + Character tools (object:Refresh replaces the option list live).
 local equipWeapon = combatTab:AddDropdown({
 	Text = "Equip Weapon",
 	Options = { "(loading...)" },
@@ -496,8 +494,8 @@ local equipWeapon = combatTab:AddDropdown({
 	Callback = placeholder("Equip Weapon"),
 })
 task.spawn(function()
-	-- TODO: replace the filler with real weapon names pulled from the player's
-	-- inventory / hotbar (e.g. iterate the Backpack + Character tools).
+	-- TODO: if the game keeps weapons in a hotbar GUI instead of Tools, swap the
+	-- source below for whatever that is.
 	local list = {}
 	for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
 		if item:IsA("Tool") then table.insert(list, item.Name) end
@@ -514,7 +512,7 @@ task.spawn(function()
 	end
 end)
 
-combatTab:AddLabel(ORDER_NOTE)
+combatTab:AddDisclaimer(ORDER_NOTE)
 combatTab:AddMultiDropdown({
 	Title = "Auto Skills",
 	Options = { "-- add skill names here --" },
