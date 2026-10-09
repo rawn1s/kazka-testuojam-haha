@@ -1,8 +1,3 @@
---=============================================================
---  Sakka Hub  --  universal.lua
---  Loaded by loader.lua; runs in the executor.
---=============================================================
-
 local SakkaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/rawn1s/SakkaUI-library/refs/heads/main/SakkaUI.lua"))()
 
 --== services ==--
@@ -20,7 +15,6 @@ local function placeholder(name)
 	end
 end
 
--- Shown BELOW any dropdown whose order matters.
 local ORDER_NOTE = "Select in order: first = most important, last = least important"
 
 local function executorName()
@@ -90,6 +84,7 @@ farmTab:AddToggle({
 })
 farmTab:AddMultiDropdown({
 	Title = "Boss Selection",
+	Note = ORDER_NOTE,
 	Options = {
 		"Zuko", "Mother Bear", "Obanai", "Zentaro", "Sumari", "Yahari",
 		"Giyu", "Reaper", "Datai", "Gyutaro", "Sanemi", "Shinobu",
@@ -100,7 +95,6 @@ farmTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Boss Selection"),
 })
-farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddToggle({
 	Text = "Auto Farm Caches",
 	Default = false,
@@ -108,11 +102,11 @@ farmTab:AddToggle({
 })
 farmTab:AddMultiDropdown({
 	Title = "Cache Selection",
+	Note = ORDER_NOTE,
 	Options = { "T1", "T2", "T3" },
 	Default = {},
 	Callback = placeholder("Cache Selection"),
 })
-farmTab:AddDisclaimer(ORDER_NOTE)
 local autoChest = farmTab:AddToggle({
 	Text = "Auto Collect Chest",
 	Default = false,
@@ -133,6 +127,7 @@ farmTab:AddToggle({
 })
 farmTab:AddMultiDropdown({
 	Title = "Auto Farm Weapon Drops",
+	Note = ORDER_NOTE,
 	Options = {
 		"Flame Katana", "Water Katana", "Thunder Katana", "Wind Katana",
 		"Insect Katana", "Serpent Katana", "Sound Katanas", "Cutlass",
@@ -142,11 +137,11 @@ farmTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Auto Farm Weapon Drops"),
 })
-farmTab:AddDisclaimer(ORDER_NOTE)
 
 farmTab:AddSection("Quests")
 farmTab:AddMultiDropdown({
 	Title = "Quest Selection",
+	Note = ORDER_NOTE,
 	Options = {
 		"Report to Noote (Lv 0)", "Recover the Lost Pages (Lv 0)",
 		"Clear the Village Spies (Lv 0)", "Deliver Package to Elara (Lv 0)",
@@ -169,7 +164,6 @@ farmTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Quest Selection"),
 })
-farmTab:AddDisclaimer(ORDER_NOTE)
 farmTab:AddToggle({
 	Text = "Auto Quest",
 	Default = false,
@@ -194,11 +188,12 @@ farmTab:AddToggle({
 })
 
 farmTab:AddSection("Breathing Style / BDA")
--- NOTE: the dropdowns here are ALWAYS visible (no DependsOn) by design.
+-- The dropdowns here are ALWAYS visible (no DependsOn) by design.
 -- The CALLBACK checks whether the player is a slayer/demon and whether an
 -- option is selected, and warns the user otherwise.
 farmTab:AddToggle({
 	Text = "Auto Breathing Style",
+	Note = "Requires you to be a Slayer, and a Breathing Style selected.",
 	Default = false,
 	Callback = placeholder("Auto Breathing Style"),
 })
@@ -210,6 +205,7 @@ farmTab:AddDropdown({
 })
 farmTab:AddToggle({
 	Text = "Auto BDA",
+	Note = "Requires you to be a Demon, and a BDA selected.",
 	Default = false,
 	Callback = placeholder("Auto BDA"),
 })
@@ -246,6 +242,7 @@ farmTab:AddDropdown({
 farmTab:AddSection("Execution Priority")
 farmTab:AddMultiDropdown({
 	Title = "Section Priority",
+	Note = ORDER_NOTE,
 	Options = {
 		"Caches / Bosses", "Weapons", "Quests", "Race",
 		"Breathing Style / BDA", "Server Hop",
@@ -253,7 +250,6 @@ farmTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Section Priority"),
 })
-farmTab:AddDisclaimer(ORDER_NOTE)
 
 --=============================================================
 --  DUNGEON / ROGUELIKE
@@ -268,20 +264,21 @@ dungeonTab:AddToggle({
 })
 dungeonTab:AddMultiDropdown({
 	Title = "Cards Not To Pick",
+	Note = ORDER_NOTE,
 	Options = { "-- add card options here --" },
 	Default = {},
 	Callback = placeholder("Cards Not To Pick"),
 })
-dungeonTab:AddDisclaimer(ORDER_NOTE)
 dungeonTab:AddMultiDropdown({
 	Title = "Cards Always To Pick",
+	Note = ORDER_NOTE,
 	Options = { "-- add card options here --" },
 	Default = {},
 	Callback = placeholder("Cards Always To Pick"),
 })
-dungeonTab:AddDisclaimer(ORDER_NOTE)
 dungeonTab:AddMultiDropdown({
 	Title = "Stat Card Priority",
+	Note = ORDER_NOTE,
 	Options = {
 		"Damage", "HP", "Cooldown Reduction", "Block Points",
 		"Stamina Regen", "Damage Reduction",
@@ -289,7 +286,6 @@ dungeonTab:AddMultiDropdown({
 	Default = {},
 	Callback = placeholder("Stat Card Priority"),
 })
-dungeonTab:AddDisclaimer(ORDER_NOTE)
 
 dungeonTab:AddSection("Action")
 dungeonTab:AddToggle({
@@ -446,6 +442,7 @@ local autoSkill = trainTab:AddToggle({
 })
 trainTab:AddMultiDropdown({
 	Title = "Allocation Priority",
+	Note = ORDER_NOTE,
 	Options = {
 		"Max Stamina", "Health Regen Speed", "Stamina Regen Speed",
 		"Max Health", "Additional Damage", "Block Regen",
@@ -456,7 +453,6 @@ trainTab:AddMultiDropdown({
 	DependsOn = autoSkill,
 	Callback = placeholder("Allocation Priority"),
 })
-trainTab:AddDisclaimer(ORDER_NOTE)
 trainTab:AddButton({
 	Text = "Allocate All Available Skill Points",
 	Callback = placeholder("Allocate All Skill Points"),
@@ -510,11 +506,11 @@ end)
 
 combatTab:AddMultiDropdown({
 	Title = "Auto Skills",
+	Note = ORDER_NOTE,
 	Options = { "-- add skill names here --" },
 	Default = {},
 	Callback = placeholder("Auto Skills"),
 })
-combatTab:AddDisclaimer(ORDER_NOTE)
 local tpMobs = combatTab:AddToggle({
 	Text = "TP All Mobs To Person",
 	Default = false,
